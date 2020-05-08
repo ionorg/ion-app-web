@@ -1,11 +1,11 @@
 {
-  "name": "ion-js-demo",
+  "name": "ion-app-web",
   "version": "0.0.1",
-  "description": "A js sdk demo for ion sfu",
+  "description": "A web app for ion",
   "main": "src/index.jsx",
   "scripts": {
     "build": "webpack --mode=production --config webpack.config.js",
-    "start": "webpack-dev-server --config ./webpack.config.js --mode development --open --https --cert ../../../configs/cert.pem --key  ../../../configs/key.pem"
+    "start": "webpack-dev-server --config ./webpack.config.js --mode development --open --https --cert ./configs/cert.pem --key  ./configs/key.pem"
   },
   "author": "pion",
   "license": "MIT",
@@ -31,7 +31,7 @@
   "dependencies": {
     "antd": "^3.25.2",
     "copy-webpack-plugin": "^5.0.5",
-    "ion-sdk": "../",
+    "ion-sdk-js": "^0.3.0",
     "mdi-react": "^6.4.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
