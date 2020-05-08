@@ -5,7 +5,7 @@
   "main": "src/index.jsx",
   "scripts": {
     "build": "webpack --mode=production --config webpack.config.js",
-    "start": "webpack-dev-server --config ./webpack.config.js --mode development --open --https --cert ./configs/cert.pem --key  ./configs/key.pem"
+    "start": "webpack-dev-server --config ./webpack.config.js --mode development --open --https --cert ./configs/certs/cert.pem --key  ./configs/certs/key.pem"
   },
   "author": "pion",
   "license": "MIT",

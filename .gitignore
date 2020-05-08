@@ -1,3 +1,5 @@
 node_modules
 dist
 
+*.pid
+nohup.out
