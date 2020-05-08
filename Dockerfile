@@ -5,15 +5,14 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm install
 
-COPY webpack.config.js .babelrc ./
-
-
-COPY dist/ dist/
+COPY public/ public/
 COPY src/ src/
 COPY styles/ styles/
+COPY webpack.config.js .babelrc ./
 
 RUN npm run build
 
+# Serve dist
 
 FROM caddy:2.0.0-rc.3-alpine
 ENV ENABLE_TELEMETRY="false"
