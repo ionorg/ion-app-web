@@ -17,7 +17,7 @@ import Message from './chat/message';
 
 import LoginForm from "./LoginForm";
 import Conference from "./Conference";
-import { Client, Stream } from "ion-sdk";
+import { Client, Stream } from "ion-sdk-js";
 
 class App extends React.Component {
   constructor() {
