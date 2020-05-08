@@ -43,7 +43,7 @@ class App extends React.Component {
       codec: "vp8"
     }
 
-    let client = new Client();
+    let client = new Client({url: "ws://localhost:8443"});
 
     let settings = reactLocalStorage.getObject("settings");
     if ( settings.codec !== undefined ){
@@ -88,7 +88,6 @@ class App extends React.Component {
       this._onMessageReceived(info);
     });
 
-    client.init();
     this.client = client;
   }
 
@@ -110,9 +109,9 @@ class App extends React.Component {
     reactLocalStorage.clear("loginInfo");
     reactLocalStorage.setObject("loginInfo", values);
     await this.client.join(values.roomId, { name: values.displayName });
-    this.setState({ 
-      login: true, 
-      loading: false, 
+    this.setState({
+      login: true,
+      loading: false,
       loginInfo: values,
       localVideoEnabled: !values.audioOnly,
     });
