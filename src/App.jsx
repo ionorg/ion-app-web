@@ -70,11 +70,11 @@ class App extends React.Component {
       console.log("transport closed!");
     });
 
-    client.on("stream-add", (id, rid, info) => {
-      console.log("stream-add %s,%s!", id, rid);
+    client.on("stream-add", (id, info) => {
+      console.log("stream-add %s,%s!", id, info);
       this._notification(
         "Stream Add",
-        "id => " + id + ", rid => " + rid + ", name => " + info.name
+        "id => " + id + ", name => " + info.name
       );
     });
 

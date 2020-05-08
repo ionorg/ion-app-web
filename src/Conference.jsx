@@ -1,6 +1,7 @@
 import React from "react";
-import { Spin } from "antd";
+import { Spin, notification } from "antd";
 import { LocalVideoView, MainVideoView, SmallVideoView } from "./videoview";
+import { Client, LocalStream, RemoteStream } from 'ion-sdk-js';
 
 class Conference extends React.Component {
   constructor() {
@@ -44,11 +45,10 @@ class Conference extends React.Component {
     await this.setState({ localStream: null, localScreen: null, streams: [] });
 
     streams.map(async item => {
-      await this._unsubscribe(item);
+      await item.stream.unsubscribe();
     });
 
-    if (localStream) await this._unpublish(localStream);
-    if (localScreen) await this._unpublish(localScreen);
+    if (localStream) await localStream.unpublish();
   };
 
   _notification = (message, description) => {
@@ -77,7 +77,10 @@ class Conference extends React.Component {
 
   muteMediaTrack = (type, enabled) => {
     let { localStream } = this.state;
-    let tracks = localStream.stream.getTracks();
+    if(!localStream) {
+      return
+    }
+    let tracks = localStream.getTracks();
     let track = tracks.find(track => track.kind === type);
     if (track) {
       track.enabled = enabled;
@@ -91,20 +94,25 @@ class Conference extends React.Component {
 
   handleLocalStream = async (enabled) => {
     let { localStream } = this.state;
-
+    const { client } = this.props;
     try {
       if (enabled) {
-        localStream = await this._publish("video");
+        localStream = await LocalStream.getUserMedia({
+            audio: true,
+            video: true
+        });
+        await client.publish(localStream);
       } else {
         if (localStream) {
           this._unpublish(localStream);
           localStream = null;
         }
       }
+      console.log("local stream", localStream)
       this.setState({ localStream });
     } catch (e) {
       console.log("handleLocalStream error => " + e);
-      _notification("publish/unpublish failed!", e);
+      // this._notification("publish/unpublish failed!", e);
     }
 
     //Check audio only conference
@@ -139,12 +147,14 @@ class Conference extends React.Component {
     }
   };
 
-  _handleAddStream = async (rid, mid, info) => {
+  _handleAddStream = async (mid, info) => {
+        console.log("Subscribe");
     const { client } = this.props;
     let streams = this.state.streams;
-    let stream = await client.subscribe(rid, mid);
+    let stream = await client.subscribe(mid);
     stream.info = info;
-    streams.push({ mid: stream.mid, stream, rid, sid: mid });
+    console.log(mid, info, stream)
+    streams.push({ mid: stream.mid, stream, sid: mid });
     this.setState({ streams });
   };
 

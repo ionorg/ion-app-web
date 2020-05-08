@@ -16,7 +16,7 @@ class LocalVideoView extends React.Component {
 
   componentDidMount = () => {
     const { stream } = this.props;
-    this.video.srcObject = stream.stream;
+    this.video.srcObject = stream;
   };
 
   componentWillUnmount = () => {
@@ -58,7 +58,7 @@ class LocalVideoView extends React.Component {
                   size="small"
                   type="link"
                   onClick={() => this.onMinimizeClick()}
-            > 
+            >
               <PictureInPictureBottomRightOutlineIcon
                 size={18}
               />
