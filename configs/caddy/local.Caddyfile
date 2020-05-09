@@ -1,4 +1,10 @@
-http://localhost:8080 {
+localhost:9090 {
   root * /app/dist
   file_server
+
+  tls /app/certs/cert.pem /app/certs/key.pem
+
+  reverse_proxy /ws biz:8443 {
+    header_up Sec-WebSocket-Protocol {>Sec-WebSocket-Protocol}
+  }
 }
