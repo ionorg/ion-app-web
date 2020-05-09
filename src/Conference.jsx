@@ -59,11 +59,12 @@ class Conference extends React.Component {
     if(!localStream) {
       return
     }
-    let tracks = localStream.getTracks();
-    let track = tracks.find(track => track.kind === type);
-    if (track) {
-      track.enabled = enabled;
+    if(enabled) {
+      localStream.unmute(type)
+    } else {
+      localStream.mute(type)
     }
+
     if (type === "audio") {
       this.setState({ audioMuted: !enabled });
     } else if (type === "video") {
