@@ -54,11 +54,11 @@ class App extends React.Component {
       await this._cleanUp();
     };
 
-    client.on("peer-join", (id, rid, info) => {
+    client.on("peer-join", (id, info) => {
       this._notification("Peer Join", "peer => " + info.name + ", join!");
     });
 
-    client.on("peer-leave", (id, rid) => {
+    client.on("peer-leave", (id) => {
       this._notification("Peer Leave", "peer => " + id + ", leave!");
     });
 
@@ -78,13 +78,13 @@ class App extends React.Component {
       );
     });
 
-    client.on("stream-remove", (id, rid) => {
-      console.log("stream-remove %s,%s!", id, rid);
-      this._notification("Stream Remove", "id => " + id + ", rid => " + rid);
+    client.on("stream-remove", (stream) => {
+      console.log("stream-remove %s,%", stream.id);
+      this._notification("Stream Remove", "id => " + stream.id);
     });
 
-    client.on("broadcast",(rid,mid,info) => {
-      console.log("broadcast %s,%s,%s!", rid, mid,info);
+    client.on("broadcast", (mid, info) => {
+      console.log("broadcast %s,%s!", mid,info);
       this._onMessageReceived(info);
     });
 
@@ -238,7 +238,7 @@ class App extends React.Component {
       "senderName":this.state.loginInfo.displayName,
       "msg": data,
     };
-    this.client.broadcast(this.state.loginInfo.roomId,info);
+    this.client.broadcast(info);
     let messages = this.state.messages;
     let uid = 0;
     messages.push(new Message({ id: uid, message: data, senderName: 'me' }));
