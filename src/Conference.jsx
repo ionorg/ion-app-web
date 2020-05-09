@@ -27,19 +27,6 @@ class Conference extends React.Component {
     client.off("stream-remove", this._handleRemoveStream);
   };
 
-  _publish = async (type, codec) => {
-    const { client, settings } = this.props;
-    let stream = await client.publish({
-      codec: settings.codec,
-      resolution: settings.resolution,
-      bandwidth: settings.bandwidth,
-      audio: true,
-      video: type === "video",
-      screen: type === "screen"
-    });
-    return stream;
-  };
-
   cleanUp = async () => {
     let { localStream, localScreen, streams } = this.state;
     await this.setState({ localStream: null, localScreen: null, streams: [] });
@@ -48,7 +35,7 @@ class Conference extends React.Component {
       await item.stream.unsubscribe();
     });
 
-    if (localStream) await localStream.unpublish();
+    await this._unpublish(localStream)
   };
 
   _notification = (message, description) => {
@@ -63,7 +50,7 @@ class Conference extends React.Component {
     const { client } = this.props;
     if (stream) {
       await this._stopMediaStream(stream);
-      await client.unpublish(stream.mid);
+      await stream.unpublish();
     }
   };
 
@@ -86,12 +73,16 @@ class Conference extends React.Component {
 
   handleLocalStream = async (enabled) => {
     let { localStream } = this.state;
-    const { client } = this.props;
+    const { client, settings } = this.props;
+    console.log(settings)
     try {
       if (enabled) {
         localStream = await LocalStream.getUserMedia({
-            audio: true,
-            video: true
+          codec: settings.codec.toUpperCase(),
+          resolution: settings.resolution,
+          bandwidth: settings.bandwidth,
+          audio: true,
+          video: true,
         });
         await client.publish(localStream);
       } else {
@@ -100,7 +91,7 @@ class Conference extends React.Component {
           localStream = null;
         }
       }
-      console.log("local stream", localStream)
+      console.log("local stream", localStream.getTracks())
       this.setState({ localStream });
     } catch (e) {
       console.log("handleLocalStream error => " + e);
@@ -114,9 +105,15 @@ class Conference extends React.Component {
 
   handleScreenSharing = async enabled => {
     let { localScreen } = this.state;
+    const { client, settings } = this.props;
     if (enabled) {
-      localScreen = await this._publish("screen");
-      let track = localScreen.stream.getVideoTracks()[0];
+      localScreen = await LocalStream.getDisplayMedia({
+        codec: settings.codec.toUpperCase(),
+        resolution: settings.resolution,
+        bandwidth: settings.bandwidth,
+      });
+      await client.publish(localScreen);
+      let track = localScreen.getVideoTracks()[0];
       if (track) {
         track.addEventListener("ended", () => {
           this.handleScreenSharing(false);
@@ -132,8 +129,7 @@ class Conference extends React.Component {
   };
 
   _stopMediaStream = async (stream) => {
-    let mstream =  stream.stream;
-    let tracks = mstream.getTracks();
+    let tracks = stream.getTracks();
     for (let i = 0, len = tracks.length; i < len; i++) {
       await tracks[i].stop();
     }
