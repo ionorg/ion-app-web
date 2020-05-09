@@ -43,7 +43,7 @@ class App extends React.Component {
       codec: "vp8"
     }
 
-    let client = new Client();
+    let client = new Client({url: "ws://localhost:8443"});
 
     let settings = reactLocalStorage.getObject("settings");
     if ( settings.codec !== undefined ){
@@ -54,11 +54,11 @@ class App extends React.Component {
       await this._cleanUp();
     };
 
-    client.on("peer-join", (id, rid, info) => {
+    client.on("peer-join", (id, info) => {
       this._notification("Peer Join", "peer => " + info.name + ", join!");
     });
 
-    client.on("peer-leave", (id, rid) => {
+    client.on("peer-leave", (id) => {
       this._notification("Peer Leave", "peer => " + id + ", leave!");
     });
 
@@ -70,25 +70,24 @@ class App extends React.Component {
       console.log("transport closed!");
     });
 
-    client.on("stream-add", (id, rid, info) => {
-      console.log("stream-add %s,%s!", id, rid);
+    client.on("stream-add", (id, info) => {
+      console.log("stream-add %s,%s!", id, info);
       this._notification(
         "Stream Add",
-        "id => " + id + ", rid => " + rid + ", name => " + info.name
+        "id => " + id + ", name => " + info.name
       );
     });
 
-    client.on("stream-remove", (id, rid) => {
-      console.log("stream-remove %s,%s!", id, rid);
-      this._notification("Stream Remove", "id => " + id + ", rid => " + rid);
+    client.on("stream-remove", (stream) => {
+      console.log("stream-remove %s,%", stream.id);
+      this._notification("Stream Remove", "id => " + stream.id);
     });
 
-    client.on("broadcast",(rid,mid,info) => {
-      console.log("broadcast %s,%s,%s!", rid, mid,info);
+    client.on("broadcast", (mid, info) => {
+      console.log("broadcast %s,%s!", mid,info);
       this._onMessageReceived(info);
     });
 
-    client.init();
     this.client = client;
   }
 
@@ -110,9 +109,9 @@ class App extends React.Component {
     reactLocalStorage.clear("loginInfo");
     reactLocalStorage.setObject("loginInfo", values);
     await this.client.join(values.roomId, { name: values.displayName });
-    this.setState({ 
-      login: true, 
-      loading: false, 
+    this.setState({
+      login: true,
+      loading: false,
       loginInfo: values,
       localVideoEnabled: !values.audioOnly,
     });
@@ -239,7 +238,7 @@ class App extends React.Component {
       "senderName":this.state.loginInfo.displayName,
       "msg": data,
     };
-    this.client.broadcast(this.state.loginInfo.roomId,info);
+    this.client.broadcast(info);
     let messages = this.state.messages;
     let uid = 0;
     messages.push(new Message({ id: uid, message: data, senderName: 'me' }));

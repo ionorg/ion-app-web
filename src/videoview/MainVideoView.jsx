@@ -3,7 +3,7 @@ import React from "react";
 class MainVideoView extends React.Component {
   componentDidMount = () => {
     const { stream } = this.props;
-    this.video.srcObject = stream.stream;
+    this.video.srcObject = stream;
   };
 
   componentWillUnmount = () => {
