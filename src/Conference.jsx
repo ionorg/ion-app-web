@@ -67,14 +67,6 @@ class Conference extends React.Component {
     }
   };
 
-  _unsubscribe = async item => {
-    const { client } = this.props;
-    if (item) {
-      item.stop();
-      await client.unsubscribe(item.rid, item.mid);
-    }
-  };
-
   muteMediaTrack = (type, enabled) => {
     let { localStream } = this.state;
     if(!localStream) {
@@ -148,7 +140,6 @@ class Conference extends React.Component {
   };
 
   _handleAddStream = async (mid, info) => {
-        console.log("Subscribe");
     const { client } = this.props;
     let streams = this.state.streams;
     let stream = await client.subscribe(mid);
@@ -158,9 +149,9 @@ class Conference extends React.Component {
     this.setState({ streams });
   };
 
-  _handleRemoveStream = async (rid, mid) => {
+  _handleRemoveStream = async (stream) => {
     let streams = this.state.streams;
-    streams = streams.filter(item => item.sid !== mid);
+    streams = streams.filter(item => item.sid !== stream.mid);
     this.setState({ streams });
   };
 
