@@ -1,7 +1,15 @@
 const webpack = require('webpack');
+const path = require('path');
 const copyWebpackPlugin = require('copy-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 
-module.exports = {
+
+module.exports = function(env) {
+  const isEnvProduction = !!env && env.production;
+  console.log('Production: ', isEnvProduction);
+
+  return {
   devtool: 'cheap-module-eval-source-map',
   entry: './src/index.jsx',
   devtool: 'source-map',//eval | source-map
@@ -15,6 +23,14 @@ module.exports = {
         test: /\.(scss|less|css)$/,
         use: ['style-loader', 'css-loader', 'sass-loader']
       },
+      {
+        test: /\.(png|jpe?g|gif|svg)$/i,
+        use: [
+          {
+            loader: 'file-loader',
+          },
+        ],
+      },
     ]
   },
   resolve: {
@@ -26,11 +42,35 @@ module.exports = {
     filename: 'ion-conference.js'
   },
   plugins: [
-    new webpack.HotModuleReplacementPlugin(),
+    new CleanWebpackPlugin(),
+    new HtmlWebpackPlugin(
+      Object.assign(
+         {},
+         {
+           inject: true,
+           template: path.resolve(__dirname, "public/index.html"),
+         },
+         isEnvProduction
+           ? {
+               minify: {
+                 removeComments: true,
+                 collapseWhitespace: true,
+                 removeRedundantAttributes: true,
+                 useShortDoctype: true,
+                 removeEmptyAttributes: true,
+                 removeStyleLinkTypeAttributes: true,
+                 keepClosingSlash: true,
+                 minifyJS: true,
+                 minifyCSS: true,
+                 minifyURLs: true,
+               },
+             }
+           : undefined
+    )),
   ],
   devServer: {
     contentBase: './dist',
     hot: true,
     host: '0.0.0.0',
   }
-};
+}};

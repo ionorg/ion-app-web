@@ -14,6 +14,7 @@ import MediaSettings from './settings';
 import ToolShare from './ToolShare';
 import ChatFeed from './chat/index';
 import Message from './chat/message';
+import pionLogo from '../public/pion-logo.svg';
 
 import LoginForm from "./LoginForm";
 import Conference from "./Conference";
@@ -259,7 +260,7 @@ class App extends React.Component {
         <Header className="app-header">
           <div className="app-header-left">
             <a href="https://pion.ly" target="_blank">
-              <img src="/pion-logo.svg" className="app-logo-img" />
+              <img src={pionLogo} className="app-logo-img" />
             </a>
           </div>
           {login ? (

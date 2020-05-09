@@ -1,0 +1,4 @@
+http://localhost:8080 {
+  root * /app/dist
+  file_server
+}
