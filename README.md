@@ -58,13 +58,14 @@ Edit `App.jsx` and update client config
 
 Change
 ```
-new Client({url: "wss://" + window.location.host});
+let client = new Client({url: "wss://" + window.location.host});
 ```
 
 To
 
 ```
-new Client({url: "ws://localhost:8443"});
+// for dev by scripts
+// let client = new Client({url: "wss://" + window.location.hostname + ":8443"});
 ```
 
 

@@ -45,6 +45,9 @@ class App extends React.Component {
 
     let client = new Client({url: "wss://" + window.location.host});
 
+    //for dev by scripts
+    //let client = new Client({url: "wss://" + window.location.hostname + ":8443"});
+
     let settings = reactLocalStorage.getObject("settings");
     if ( settings.codec !== undefined ){
         this._settings = settings;
