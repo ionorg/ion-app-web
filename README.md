@@ -7,6 +7,7 @@ Build docker image with production build of web app. Serve on `https://localhost
 Biz websocket is proxied using caddy server and docker network from ion.
 
 ```
+docker network create ionnet
 docker-compose up --build
 ```
 
