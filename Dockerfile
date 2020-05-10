@@ -14,7 +14,7 @@ RUN npm run build
 
 # Serve dist
 
-FROM caddy:2.0.0-rc.3-alpine
+FROM caddy:2.0.0-alpine
 ENV ENABLE_TELEMETRY="false"
 
 WORKDIR /app
