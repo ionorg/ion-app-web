@@ -5,7 +5,7 @@ services:
     build: .
     volumes:
       # Uncomment for production
-      # - "./docker/Caddyfile:/etc/caddy/Caddyfile"
+      # - "./configs/caddy/Caddyfile:/etc/caddy/Caddyfile"
       # Dev caddyfile
       - "./configs/caddy/local.Caddyfile:/etc/caddy/Caddyfile"
       - "caddy:/root/.caddy/"
@@ -13,10 +13,17 @@ services:
       # Prod ports
       # - 80:80
       # - 443:443
-      - 8080:8080
+      - 9090:9090
+    networks:
+      - ionnet
     environment:
     - WWW_URL
     - ADMIN_EMAIL
 
 volumes:
   caddy:
+
+networks:
+  ionnet:
+    external: true
+    name: ionnet

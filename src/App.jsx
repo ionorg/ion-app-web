@@ -43,7 +43,7 @@ class App extends React.Component {
       codec: "vp8"
     }
 
-    let client = new Client({url: "ws://localhost:8443"});
+    let client = new Client({url: "wss://" + window.location.host});
 
     let settings = reactLocalStorage.getObject("settings");
     if ( settings.codec !== undefined ){
