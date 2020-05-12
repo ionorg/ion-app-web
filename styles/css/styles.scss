@@ -506,7 +506,7 @@ body {
   padding: 10px;
   border-top-width: 1px;
   border-top-style: solid;
-  border-top-color: #ddd;
+  border-top-color: #888888;
   padding-bottom:20px;
 }
 
@@ -611,17 +611,18 @@ body {
   flex-direction: column;
   flex: 1;
   overflow: hidden;
-  background-color:#4e4c4c;
+  background-color:#555555;
 }
 
 .title-panel{
   display: flex;
+  align-items: center;
   height: 36px;
-  background-color: #4e4c4c;
+  background-color: #555555;
   padding-top: 4px;
   border-bottom-width: 1px;
   border-bottom-style: solid;
-  border-bottom-color: #ddd;
+  border-bottom-color: #888888;
 }
 
 .chat-history{
