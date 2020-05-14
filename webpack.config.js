@@ -39,7 +39,7 @@ module.exports = function(env) {
   output: {
     path: __dirname + '/dist',
     publicPath: '/',
-    filename: 'ion-conference.js'
+    filename: 'ion-conference.[hash].js'
   },
   plugins: [
     new CleanWebpackPlugin(),

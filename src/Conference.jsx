@@ -180,7 +180,7 @@ class Conference extends React.Component {
   };
 
   render = () => {
-    const { client } = this.props;
+    const { client, vidFit } = this.props;
     const {
       streams,
       localStream,
@@ -198,7 +198,7 @@ class Conference extends React.Component {
         )}
         {streams.map((item, index) => {
           return index == 0 ? (
-            <MainVideoView key={item.mid} id={item.mid} stream={item.stream} />
+            <MainVideoView key={item.mid} id={item.mid} stream={item.stream} vidFit={vidFit} />
           ) : (
             ""
           );
