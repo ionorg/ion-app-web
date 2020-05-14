@@ -69,7 +69,6 @@ module.exports = function(env) {
     )),
   ],
   devServer: {
-    contentBase: './dist',
     hot: true,
     host: '0.0.0.0',
   }
