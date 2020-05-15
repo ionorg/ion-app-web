@@ -1,6 +1,7 @@
 import React from "react";
 import { Form, Icon, Input, Button,Checkbox } from "antd";
 import { reactLocalStorage } from "reactjs-localstorage";
+import "../styles/css/login.scss";
 
 class LoginForm extends React.Component {
 
@@ -47,7 +48,7 @@ class LoginForm extends React.Component {
   };
 
   getRequest() {
-    let url = location.search; 
+    let url = location.search;
     let theRequest = new Object();
     if (url.indexOf("?") != -1) {
       let str = url.substr(1);

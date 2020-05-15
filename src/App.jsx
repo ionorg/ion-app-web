@@ -15,6 +15,7 @@ import ToolShare from './ToolShare';
 import ChatFeed from './chat/index';
 import Message from './chat/message';
 import pionLogo from '../public/pion-logo.svg';
+import "../styles/css/app.scss";
 
 import LoginForm from "./LoginForm";
 import Conference from "./Conference";
@@ -31,6 +32,7 @@ class App extends React.Component {
       screenSharingEnabled: false,
       collapsed: true,
       isFullScreen: false,
+      vidFit: false,
       loginInfo: {},
       messages: [],
     };
@@ -174,6 +176,12 @@ class App extends React.Component {
     });
   };
 
+  _onVidFitClickHandler = () => {
+    this.setState({
+      vidFit: !this.state.vidFit
+    });
+  };
+
   _onFullScreenClickHandler = () => {
     let docElm = document.documentElement;
 
@@ -255,7 +263,8 @@ class App extends React.Component {
       localAudioEnabled,
       localVideoEnabled,
       screenSharingEnabled,
-      collapsed
+      collapsed,
+      vidFit
     } = this.state;
     return (
       <Layout className="app-layout">
@@ -364,6 +373,7 @@ class App extends React.Component {
                     settings={this._settings}
                     localAudioEnabled={localAudioEnabled}
                     localVideoEnabled={localVideoEnabled}
+                    vidFit={vidFit}
                     ref={ref => {
                       this.conference = ref;
                     }}
@@ -381,6 +391,15 @@ class App extends React.Component {
                   </Tooltip>
                 </div>
                 <div className="app-fullscreen-button">
+                <Tooltip title='Fit/Stretch Video'>
+                  <Button
+                    icon={this.state.vidFit ? "minus-square" : "plus-square"}
+                    size="large"
+                    shape="circle"
+                    ghost
+                    onClick={() => this._onVidFitClickHandler()}
+                  />
+                </Tooltip>
                   <Tooltip title='Fullscreen/Exit'>
                     <Button
                       icon={this.state.isFullScreen ? "fullscreen-exit" : "fullscreen"}

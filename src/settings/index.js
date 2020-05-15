@@ -2,6 +2,7 @@ import React from 'react';
 import { Modal, Button, Select,Tooltip } from 'antd';
 import SoundMeter from './soundmeter';
 import PropTypes from 'prop-types';
+import "./style.scss";
 
 const Option = Select.Option;
 
