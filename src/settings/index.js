@@ -1,7 +1,9 @@
 import React from 'react';
-import { Modal, Button, Select,Tooltip } from 'antd';
+import { Modal, Button, Select,Tooltip,Switch } from 'antd';
 import SoundMeter from './soundmeter';
 import PropTypes from 'prop-types';
+import { reactLocalStorage } from "reactjs-localstorage";
+import "./style.scss";
 
 const Option = Select.Option;
 
@@ -55,6 +57,7 @@ export default class MediaSettings extends React.Component {
             selectedAudioDevice: settings.selectedAudioDevice,
             selectedVideoDevice: settings.selectedVideoDevice,
             codec: settings.codec,
+            isDevMode:settings.isDevMode,
         }
 
         try {
@@ -181,8 +184,11 @@ export default class MediaSettings extends React.Component {
                 this.state.selectedVideoDevice,
                 this.state.resolution,
                 this.state.bandwidth,
-                this.state.codec);
+                this.state.codec,
+                this.state.isDevMode);
         }
+
+
     }
 
     handleCancel = (e) => {
@@ -214,6 +220,12 @@ export default class MediaSettings extends React.Component {
         this.setState({ bandwidth: e });
     }
 
+    handleDevChange = (checked) => {
+        this.setState({
+            isDevMode:checked,
+        });
+    }
+
     render() {
         return (
             <div>
@@ -229,6 +241,12 @@ export default class MediaSettings extends React.Component {
                     onCancel={this.handleCancel}
                     okText='Ok'
                     cancelText='Cancel'>
+                    <div className="settings-item">
+                        <span className="settings-item-left">DevMode</span>
+                        <div className="settings-item-right">
+                            <Switch checked={this.state.isDevMode} onChange={this.handleDevChange} />
+                        </div>
+                    </div>
                     <div className="settings-item">
                         <span className="settings-item-left">Micphone</span>
                         <div className="settings-item-right">

@@ -15,6 +15,7 @@ import ToolShare from './ToolShare';
 import ChatFeed from './chat/index';
 import Message from './chat/message';
 import pionLogo from '../public/pion-logo.svg';
+import "../styles/css/app.scss";
 
 import LoginForm from "./LoginForm";
 import Conference from "./Conference";
@@ -31,6 +32,7 @@ class App extends React.Component {
       screenSharingEnabled: false,
       collapsed: true,
       isFullScreen: false,
+      vidFit: false,
       loginInfo: {},
       messages: [],
     };
@@ -40,18 +42,22 @@ class App extends React.Component {
       selectedVideoDevice: "",
       resolution: "hd",
       bandwidth: 1024,
-      codec: "vp8"
+      codec: "vp8",
+      isDevMode:false,
     }
-
-    let client = new Client({url: "wss://" + window.location.host});
-
-    //for dev by scripts
-    //let client = new Client({url: "wss://" + window.location.hostname + ":8443"});
 
     let settings = reactLocalStorage.getObject("settings");
     if ( settings.codec !== undefined ){
         this._settings = settings;
     }
+
+    let url = "wss://" + window.location.host;
+    //for dev by scripts
+    if(this._settings.isDevMode){
+      url = "wss://" + window.location.hostname + ":8443";
+    }
+    console.log("Wss url is:" + url);
+    let client = new Client({url: url});
 
     window.onunload = async () => {
       await this._cleanUp();
@@ -174,6 +180,12 @@ class App extends React.Component {
     });
   };
 
+  _onVidFitClickHandler = () => {
+    this.setState({
+      vidFit: !this.state.vidFit
+    });
+  };
+
   _onFullScreenClickHandler = () => {
     let docElm = document.documentElement;
 
@@ -222,8 +234,8 @@ class App extends React.Component {
       false;
   }
 
-  _onMediaSettingsChanged = (selectedAudioDevice, selectedVideoDevice, resolution, bandwidth, codec) => {
-    this._settings = { selectedAudioDevice, selectedVideoDevice, resolution, bandwidth, codec }
+  _onMediaSettingsChanged = (selectedAudioDevice, selectedVideoDevice, resolution, bandwidth, codec,isDevMode) => {
+    this._settings = { selectedAudioDevice, selectedVideoDevice, resolution, bandwidth, codec,isDevMode }
     reactLocalStorage.setObject("settings", this._settings);
   }
 
@@ -255,7 +267,8 @@ class App extends React.Component {
       localAudioEnabled,
       localVideoEnabled,
       screenSharingEnabled,
-      collapsed
+      collapsed,
+      vidFit
     } = this.state;
     return (
       <Layout className="app-layout">
@@ -364,6 +377,7 @@ class App extends React.Component {
                     settings={this._settings}
                     localAudioEnabled={localAudioEnabled}
                     localVideoEnabled={localVideoEnabled}
+                    vidFit={vidFit}
                     ref={ref => {
                       this.conference = ref;
                     }}
@@ -381,6 +395,15 @@ class App extends React.Component {
                   </Tooltip>
                 </div>
                 <div className="app-fullscreen-button">
+                <Tooltip title='Fit/Stretch Video'>
+                  <Button
+                    icon={this.state.vidFit ? "minus-square" : "plus-square"}
+                    size="large"
+                    shape="circle"
+                    ghost
+                    onClick={() => this._onVidFitClickHandler()}
+                  />
+                </Tooltip>
                   <Tooltip title='Fullscreen/Exit'>
                     <Button
                       icon={this.state.isFullScreen ? "fullscreen-exit" : "fullscreen"}
