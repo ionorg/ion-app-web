@@ -1,0 +1,143 @@
+
+/*------------------local-video--------------------*/
+.local-video-name {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+}
+
+.local-video-container {
+  width: 220px;
+  height: 140px;
+  z-index: 99;
+  overflow: hidden;
+  border-width: 0.5px;
+  border-style: solid;
+  border-color: #ffffff;
+  border-radius: 2px;
+}
+
+.local-video-size {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background-color: rgb(0, 21, 42);
+}
+
+.local-video-icon-layout{
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.local-video-min-layout{
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.local-video-avatar{
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/*------------------main-video--------------------*/
+.main-video-layout {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+}
+
+.main-video-size {
+  width: 100%;
+  height: 100%;
+}
+
+.fit-vid {
+  object-fit: cover;
+}
+
+.main-video-name{
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 8px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.main-video-name-a {
+  font-size: large;
+  color: #dbdbdb;
+}
+
+/*------------------small-video--------------------*/
+.small-video-list-div{
+  position: absolute;
+  left: 100px;
+  right: 100px;
+  bottom: 30px;
+  height: 140px;
+  overflow-y: hidden;
+  overflow-x: auto;
+}
+
+
+.small-video-list{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.small-video-div{
+  display: flex;
+  width: 220px;
+  height: 140px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: #ffffff;
+  background-color:#323232;
+  border-radius: 2px;
+  margin-right: 1px;
+  margin-left: 1px;
+}
+
+.small-video-size {
+  width: 218px;
+  height: 138px;
+  object-fit: cover;
+}
+
+.small-video-id-div {
+  position: absolute;
+  width: 218px;
+}
+
+.small-video-id-a{
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  right: 8px;
+  font-size: larger;
+  color: #dbdbdb;
+}

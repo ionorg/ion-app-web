@@ -15,6 +15,7 @@ import ToolShare from './ToolShare';
 import ChatFeed from './chat/index';
 import Message from './chat/message';
 import pionLogo from '../public/pion-logo.svg';
+import "../styles/css/app.scss";
 
 import LoginForm from "./LoginForm";
 import Conference from "./Conference";

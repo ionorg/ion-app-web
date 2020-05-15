@@ -2,6 +2,7 @@ import React from "react";
 import { Spin, notification } from "antd";
 import { LocalVideoView, MainVideoView, SmallVideoView } from "./videoview";
 import { Client, LocalStream, RemoteStream } from 'ion-sdk-js';
+import "../styles/css/conference.scss";
 
 class Conference extends React.Component {
   constructor() {
