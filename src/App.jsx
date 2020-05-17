@@ -394,7 +394,7 @@ class App extends React.Component {
                     />
                   </Tooltip>
                 </div>
-                <div className="app-fullscreen-button">
+                <div className="app-fullscreen-layout">
                 <Tooltip title='Fit/Stretch Video'>
                   <Button
                     icon={this.state.vidFit ? "minus-square" : "plus-square"}
@@ -409,6 +409,7 @@ class App extends React.Component {
                       icon={this.state.isFullScreen ? "fullscreen-exit" : "fullscreen"}
                       size="large"
                       shape="circle"
+                      className="app-fullscreen-button"
                       ghost
                       onClick={() => this._onFullScreenClickHandler()}
                     />

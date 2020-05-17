@@ -59,7 +59,7 @@ export default class MediaSettings extends React.Component {
             codec: settings.codec,
             isDevMode:settings.isDevMode,
         }
-
+        
         try {
             window.AudioContext = window.AudioContext || window.webkitAudioContext;
             window.audioContext = new AudioContext();
