@@ -53,10 +53,12 @@ class App extends React.Component {
 
     let url = "wss://" + window.location.host;
     //for dev by scripts
-    if(this._settings.isDevMode){
-      url = "wss://" + window.location.hostname + ":8443";
+    if(process.env.NODE_ENV == "development"){
+      const proto = this._settings.isDevMode ? "ws" : "wss"
+      url = proto + "://" + window.location.hostname + ":8443";
     }
-    console.log("Wss url is:" + url);
+
+    console.log("WS url is:" + url);
     let client = new Client({url: url});
 
     window.onunload = async () => {
@@ -115,7 +117,7 @@ class App extends React.Component {
 
   _handleJoin = async values => {
     this.setState({ loading: true });
-    reactLocalStorage.clear("loginInfo");
+    reactLocalStorage.remove("loginInfo");
     reactLocalStorage.setObject("loginInfo", values);
     await this.client.join(values.roomId, { name: values.displayName });
     this.setState({

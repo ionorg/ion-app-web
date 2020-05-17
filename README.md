@@ -62,23 +62,6 @@ Install node modules
 npm i
 ```
 
-For node dev server the client must be modified for the biz socket.
-
-Edit `App.jsx` and update client config
-
-Change
-
-```
-let client = new Client({url: "wss://" + window.location.host});
-```
-
-To
-
-```
-// for dev by scripts
-// let client = new Client({url: "wss://" + window.location.hostname + ":8443"});
-```
-
 #### Run
 
 Start dev server
