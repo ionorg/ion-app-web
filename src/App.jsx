@@ -117,7 +117,7 @@ class App extends React.Component {
 
   _handleJoin = async values => {
     this.setState({ loading: true });
-    reactLocalStorage.clear("loginInfo");
+    reactLocalStorage.remove("loginInfo");
     reactLocalStorage.setObject("loginInfo", values);
     await this.client.join(values.roomId, { name: values.displayName });
     this.setState({
