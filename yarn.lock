@@ -3732,10 +3732,10 @@ invert-kv@^2.0.0:
   resolved "https://registry.yarnpkg.com/invert-kv/-/invert-kv-2.0.0.tgz#7393f5afa59ec9ff5f67a27620d11c226e3eec02"
   integrity sha512-wPVv/y/QQ/Uiirj/vh3oP+1Ww+AWehmi1g5fFWGPF6IpCBCDVrhgHRMvrLfdYcwDh3QJbGXDW4JAuzxElLSqKA==
 
-ion-sdk-js@^0.3.6:
-  version "0.3.6"
-  resolved "https://registry.yarnpkg.com/ion-sdk-js/-/ion-sdk-js-0.3.6.tgz#2b85b3b70ff87e82b410f91cb02e28898c813c1a"
-  integrity sha512-pD7Nou+aImRnbbbCuEmTk8+uLNEMGnsVaKm5dfPW/wV/2BcxaCEBl+tUpc+D6NHy0dmqHJGXoky5p8ihbfeNug==
+ion-sdk-js@^0.3.7:
+  version "0.3.7"
+  resolved "https://registry.yarnpkg.com/ion-sdk-js/-/ion-sdk-js-0.3.7.tgz#2e7b5a7929b636f31be2ad720b46c1e6efeff978"
+  integrity sha512-KF6Z7n9t6HsUBUHf/ZGStK7cwIMROLWeHTO2jrqBq8MwE0dD+mAa8HRGuNWW5SVK2GlvCmRLZicQk65TnP4iag==
   dependencies:
     events "^3.0.0"
     lodash "^4.17.15"
