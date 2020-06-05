@@ -8,7 +8,7 @@ services:
       # - "./configs/caddy/Caddyfile:/etc/caddy/Caddyfile"
       # Dev caddyfile
       - "./configs/caddy/local.Caddyfile:/etc/caddy/Caddyfile"
-      - "caddy:/root/.caddy/"
+      - "caddy:/data"
     ports:
       # Prod ports
       # - 80:80
