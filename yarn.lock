@@ -6026,10 +6026,10 @@ react@^16.8.6:
     object-assign "^4.1.1"
     prop-types "^15.6.2"
 
-reactjs-localstorage@0.0.8:
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/reactjs-localstorage/-/reactjs-localstorage-0.0.8.tgz#34934d3ec81a2326e4604617edd193e60c4ec914"
-  integrity sha512-4gtrf4O7J0trFRmX28eyypaj3v/HhAa9Z6Glv8PXD/sEkmFd+JkLn+JMynstCUfFqNJHWop9FOc8UB6Kwj4NqA==
+reactjs-localstorage@1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/reactjs-localstorage/-/reactjs-localstorage-1.0.1.tgz#0c4311527d9e9abb31dc1c40d64cb886204e0f23"
+  integrity sha512-eNSwfiVyVDhfjw9h83PBvgqQcFxmyK6KGPrPlutuaaTlALRZVQLZ0MAN72iU9UT+bKtscwtdogHQ2ikZ7rjT+w==
 
 read-pkg-up@^1.0.1:
   version "1.0.1"
