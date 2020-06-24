@@ -70,6 +70,12 @@ module.exports = function(env) {
   ],
   devServer: {
     hot: true,
-    host: '0.0.0.0',
+    host: 'localhost',
+    proxy: {
+      '/ws': {
+         target: 'ws://localhost:8443',
+         ws: true
+      },
+    },
   }
 }};

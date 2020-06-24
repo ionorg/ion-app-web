@@ -73,7 +73,7 @@ class App extends React.Component {
     //for dev by scripts
     if(process.env.NODE_ENV == "development"){
       const proto = this._settings.isDevMode ? "ws" : "wss"
-      url = proto + "://" + window.location.hostname + ":8443";
+      url = proto + "://" + window.location.host;
     }
 
     console.log("WS url is:" + url);
