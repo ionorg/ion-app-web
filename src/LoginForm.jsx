@@ -71,7 +71,7 @@ class LoginForm extends React.Component {
           })(
             <Input
               prefix={<Icon type="team" className="login-input-icon" />}
-              placeholder="Room Id"
+              placeholder="Table ID"
             />
           )}
         </Form.Item>

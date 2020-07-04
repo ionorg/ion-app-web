@@ -1,25 +1,25 @@
-import React from "react";
-import { Layout, Button, Modal, Icon, notification, Card, Spin, Tooltip } from "antd";
-const { confirm } = Modal;
-const { Header, Content, Footer, Sider } = Layout;
-import { reactLocalStorage } from "reactjs-localstorage";
+import { Button, Card, Icon, Layout, Modal, notification, Spin, Tooltip } from "antd";
+import { Client } from "ion-sdk-js";
 import MicrophoneIcon from "mdi-react/MicrophoneIcon";
 import MicrophoneOffIcon from "mdi-react/MicrophoneOffIcon";
 import HangupIcon from "mdi-react/PhoneHangupIcon";
 import TelevisionIcon from "mdi-react/TelevisionIcon";
 import TelevisionOffIcon from "mdi-react/TelevisionOffIcon";
-import VideoIcon from "mdi-react/VideoIcon";
 import VideocamOffIcon from "mdi-react/VideocamOffIcon";
-import MediaSettings from './settings';
-import ToolShare from './ToolShare';
+import VideoIcon from "mdi-react/VideoIcon";
+import React from "react";
+import { reactLocalStorage } from "reactjs-localstorage";
+import pionLogo from '../public/cb-logo.png';
+import "../styles/css/app.scss";
 import ChatFeed from './chat/index';
 import Message from './chat/message';
-import pionLogo from '../public/pion-logo.svg';
-import "../styles/css/app.scss";
-
-import LoginForm from "./LoginForm";
 import Conference from "./Conference";
-import { Client, Stream } from "ion-sdk-js";
+import LoginForm from "./LoginForm";
+import MediaSettings from './settings';
+import ToolShare from './ToolShare';
+const { confirm } = Modal;
+const { Header, Content, Footer, Sider } = Layout;
+
 
 class App extends React.Component {
   constructor() {
@@ -43,12 +43,12 @@ class App extends React.Component {
       resolution: "hd",
       bandwidth: 1024,
       codec: "vp8",
-      isDevMode:false,
+      isDevMode: false,
     }
 
     let settings = reactLocalStorage.getObject("settings");
-    if ( settings.codec !== undefined ){
-        this._settings = settings;
+    if (settings.codec !== undefined) {
+      this._settings = settings;
     }
 
   }
@@ -71,13 +71,13 @@ class App extends React.Component {
 
     let url = "wss://" + window.location.host;
     //for dev by scripts
-    if(process.env.NODE_ENV == "development"){
+    if (process.env.NODE_ENV == "development") {
       const proto = this._settings.isDevMode ? "ws" : "wss"
       url = proto + "://" + window.location.host;
     }
 
     console.log("WS url is:" + url);
-    let client = new Client({url: url});
+    let client = new Client({ url: url });
 
     window.onunload = async () => {
       await this._cleanUp();
@@ -114,7 +114,7 @@ class App extends React.Component {
     });
 
     client.on("broadcast", (mid, info) => {
-      console.log("broadcast %s,%s!", mid,info);
+      console.log("broadcast %s,%s!", mid, info);
       this._onMessageReceived(info);
     });
 
@@ -241,8 +241,8 @@ class App extends React.Component {
       false;
   }
 
-  _onMediaSettingsChanged = (selectedAudioDevice, selectedVideoDevice, resolution, bandwidth, codec,isDevMode) => {
-    this._settings = { selectedAudioDevice, selectedVideoDevice, resolution, bandwidth, codec,isDevMode }
+  _onMediaSettingsChanged = (selectedAudioDevice, selectedVideoDevice, resolution, bandwidth, codec, isDevMode) => {
+    this._settings = { selectedAudioDevice, selectedVideoDevice, resolution, bandwidth, codec, isDevMode }
     reactLocalStorage.setObject("settings", this._settings);
   }
 
@@ -256,8 +256,8 @@ class App extends React.Component {
 
   _onSendMessage = (data) => {
     console.log('Send message:' + data);
-    var info =  {
-      "senderName":this.state.loginInfo.displayName,
+    var info = {
+      "senderName": this.state.loginInfo.displayName,
       "msg": data,
     };
     this.client.broadcast(info);
@@ -279,7 +279,7 @@ class App extends React.Component {
     } = this.state;
     return (
       <Layout className="app-layout">
-        <Header className="app-header">
+        <Header className="app-header" style={{ background: 'lightgoldenrodyellow' }}>
           <div className="app-header-left">
             <a href="https://pion.ly" target="_blank">
               <img src={pionLogo} className="app-logo-img" />
@@ -324,7 +324,6 @@ class App extends React.Component {
               <Tooltip title='Hangup'>
                 <Button
                   shape="circle"
-                  ghost
                   size="large"
                   type="danger"
                   style={{ marginLeft: 16, marginRight: 16 }}
@@ -373,7 +372,7 @@ class App extends React.Component {
                 collapsible
                 collapsed={this.state.collapsed}>
                 <div className="left-container">
-                  <ChatFeed messages={this.state.messages} onSendMessage={this._onSendMessage}/>
+                  <ChatFeed messages={this.state.messages} onSendMessage={this._onSendMessage} />
                 </div>
               </Sider>
               <Layout className="app-right-layout">
@@ -402,15 +401,15 @@ class App extends React.Component {
                   </Tooltip>
                 </div>
                 <div className="app-fullscreen-layout">
-                <Tooltip title='Fit/Stretch Video'>
-                  <Button
-                    icon={this.state.vidFit ? "minus-square" : "plus-square"}
-                    size="large"
-                    shape="circle"
-                    ghost
-                    onClick={() => this._onVidFitClickHandler()}
-                  />
-                </Tooltip>
+                  <Tooltip title='Fit/Stretch Video'>
+                    <Button
+                      icon={this.state.vidFit ? "minus-square" : "plus-square"}
+                      size="large"
+                      shape="circle"
+                      ghost
+                      onClick={() => this._onVidFitClickHandler()}
+                    />
+                  </Tooltip>
                   <Tooltip title='Fullscreen/Exit'>
                     <Button
                       icon={this.state.isFullScreen ? "fullscreen-exit" : "fullscreen"}
@@ -428,7 +427,7 @@ class App extends React.Component {
           ) : loading ? (
             <Spin size="large" tip="Connecting..." />
           ) : (
-                <Card title="Join to Ion" className="app-login-card">
+                <Card title="Join a table" className="app-login-card">
                   <LoginForm handleLogin={this._handleJoin} />
                 </Card>
               )}

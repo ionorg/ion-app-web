@@ -1,3 +1,4 @@
+$primary-color: sienna;
 
 /*------------------app--------------------*/
 .app-layout {
@@ -67,6 +68,7 @@
   align-items: center;
   width: 100%;
   min-height: 540px;
+  background: floralwhite;
 }
 
 .app-login-card {
@@ -102,4 +104,23 @@
 
 .app-fullscreen-button{
   margin-left: 10px;
+}
+
+::selection {
+  background: $primary-color !important;
+}
+
+.ant-btn-primary {
+  color: floralwhite !important;
+  background: $primary-color !important;
+  border: none !important;
+}
+
+.ant-input-affix-wrapper:hover .ant-input:not(.ant-input-disabled) {
+  border-color: $primary-color !important;
+}
+
+.ant-btn-background-ghost {
+  color: $primary-color !important;
+  border-color: $primary-color;
 }

@@ -231,7 +231,7 @@ export default class MediaSettings extends React.Component {
             <div>
                 {
                     <Tooltip title='System setup'>
-                        <Button shape="circle" icon="setting" ghost onClick={this.showModal}/>
+                        <Button shape="circle" icon="setting" onClick={this.showModal}/>
                     </Tooltip>
                 }
                 <Modal
