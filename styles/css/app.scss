@@ -1,4 +1,5 @@
 $primary-color: sienna;
+$accent-color: floralwhite;
 
 /*------------------app--------------------*/
 .app-layout {
@@ -68,7 +69,7 @@ $primary-color: sienna;
   align-items: center;
   width: 100%;
   min-height: 540px;
-  background: floralwhite;
+  background: $accent-color;
 }
 
 .app-login-card {
@@ -111,16 +112,31 @@ $primary-color: sienna;
 }
 
 .ant-btn-primary {
-  color: floralwhite !important;
+  color: $accent-color !important;
   background: $primary-color !important;
   border: none !important;
 }
 
-.ant-input-affix-wrapper:hover .ant-input:not(.ant-input-disabled) {
+.ant-input-affix-wrapper:hover .ant-input:not(.ant-input-disabled),
+.ant-input-affix-wrapper:active .ant-input:not(.ant-input-disabled),
+.ant-input-affix-wrapper:focus .ant-input:not(.ant-input-disabled) {
   border-color: $primary-color !important;
 }
 
 .ant-btn-background-ghost {
   color: $primary-color !important;
-  border-color: $primary-color;
+  border-color: transparent !important;
+}
+
+.ant-btn:hover, .ant-btn:active, .ant-btn:focus {
+  color: $primary-color !important;
+  border-color: $primary-color !important;
+}
+
+.ant-spin {
+  color: $accent-color !important;
+}
+
+.ant-spin-dot-item {
+  background-color: $accent-color !important;
 }

@@ -1,3 +1,4 @@
+$accent-color: floralwhite;
 /*---------------chat-styles--------------------*/
 
 .left-container{
@@ -10,7 +11,7 @@
 
 .title-chat{
   font-size: 16px;
-  color: #fff;
+  color: $accent-color;
   margin-left: 10px;
 }
 
@@ -72,7 +73,7 @@
 }
 
 .bubble-msgword{
-  background-color:#fff;
+  background-color: $accent-color;
   display: inline-block;
   margin-top:6px;
   padding-top:8px;
@@ -83,7 +84,7 @@
 }
 
 .bubble-msgword-middle{
-  background-color:#fafafa;
+  background-color: $accent-color;
   display: inline-block;
   margin-top:6px;
   padding-top:8px;
@@ -126,14 +127,14 @@
   flex-direction: column;
   flex: 1;
   overflow: hidden;
-  background-color:#555555;
+  background-color: #35312c;
 }
 
 .title-panel{
   display: flex;
   align-items: center;
   height: 36px;
-  background-color: #555555;
+  background-color:  #35312c;
   padding-top: 4px;
   border-bottom-width: 1px;
   border-bottom-style: solid;

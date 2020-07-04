@@ -9,7 +9,7 @@ import VideocamOffIcon from "mdi-react/VideocamOffIcon";
 import VideoIcon from "mdi-react/VideoIcon";
 import React from "react";
 import { reactLocalStorage } from "reactjs-localstorage";
-import pionLogo from '../public/cb-logo.png';
+import cbLogo from '../public/cb-logo.png';
 import "../styles/css/app.scss";
 import ChatFeed from './chat/index';
 import Message from './chat/message';
@@ -281,8 +281,8 @@ class App extends React.Component {
       <Layout className="app-layout">
         <Header className="app-header" style={{ background: 'lightgoldenrodyellow' }}>
           <div className="app-header-left">
-            <a href="https://pion.ly" target="_blank">
-              <img src={pionLogo} className="app-logo-img" />
+            <a href="https://cafe.coffeebeans.io" target="_blank">
+              <img src={cbLogo} className="app-logo-img" />
             </a>
           </div>
           {login ? (
@@ -366,7 +366,7 @@ class App extends React.Component {
             <Layout className="app-content-layout">
               <Sider
                 width={320}
-                style={{ background: "#333" }}
+                style={{ background: "sienna" }}
                 collapsedWidth={0}
                 trigger={null}
                 collapsible
@@ -395,7 +395,6 @@ class App extends React.Component {
                       icon={this.state.collapsed ? "right" : "left"}
                       size="large"
                       shape="circle"
-                      ghost
                       onClick={() => this._openOrCloseLeftContainer(!collapsed)}
                     />
                   </Tooltip>
@@ -406,7 +405,6 @@ class App extends React.Component {
                       icon={this.state.vidFit ? "minus-square" : "plus-square"}
                       size="large"
                       shape="circle"
-                      ghost
                       onClick={() => this._onVidFitClickHandler()}
                     />
                   </Tooltip>
@@ -416,7 +414,6 @@ class App extends React.Component {
                       size="large"
                       shape="circle"
                       className="app-fullscreen-button"
-                      ghost
                       onClick={() => this._onFullScreenClickHandler()}
                     />
                   </Tooltip>
