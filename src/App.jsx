@@ -1,4 +1,5 @@
 import {
+  Badge,
   Button,
   Card,
   Icon,
@@ -44,6 +45,7 @@ class App extends React.Component {
       vidFit: false,
       loginInfo: {},
       messages: [],
+      showChatNotificationDot: false
     };
 
     this._settings = {
@@ -119,6 +121,9 @@ class App extends React.Component {
 
     client.on("broadcast", (mid, info) => {
       console.log("broadcast %s,%s!", mid, info);
+      if (this.state.collapsed) {
+        this._showOrHideChatNotificationDot(true);
+      }
       this._onMessageReceived(info);
     });
 
@@ -185,7 +190,14 @@ class App extends React.Component {
     this.conference = ref;
   };
 
+  _showOrHideChatNotificationDot = show => {
+      this.setState({showNotificationDot: show});
+  };
+
   _openOrCloseLeftContainer = collapsed => {
+    if (!collapsed) {
+      this._showOrHideChatNotificationDot(false);
+    }
     this.setState({
       collapsed: collapsed
     });
@@ -409,13 +421,17 @@ class App extends React.Component {
                     </Content>
                     <div className="app-collapsed-button">
                       <Tooltip title='Open/Close chat panel'>
-                        <Button
-                            icon={this.state.collapsed ? "right" : "left"}
-                            size="large"
-                            shape="circle"
-                            onClick={() => this._openOrCloseLeftContainer(
-                                !collapsed)}
-                        />
+                        <Badge
+                            count={this.state.showChatNotificationDot ? 1 : 0}
+                            dot>
+                          <Button
+                              icon={this.state.collapsed ? "right" : "left"}
+                              size="large"
+                              shape="circle"
+                              onClick={() => this._openOrCloseLeftContainer(
+                                  !collapsed)}
+                          />
+                        </Badge>
                       </Tooltip>
                     </div>
                     <div className="app-fullscreen-layout">
