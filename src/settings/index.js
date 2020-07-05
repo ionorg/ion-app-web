@@ -242,12 +242,6 @@ export default class MediaSettings extends React.Component {
                     okText='Ok'
                     cancelText='Cancel'>
                     <div className="settings-item">
-                        <span className="settings-item-left">DevMode</span>
-                        <div className="settings-item-right">
-                            <Switch checked={this.state.isDevMode} onChange={this.handleDevChange} />
-                        </div>
-                    </div>
-                    <div className="settings-item">
                         <span className="settings-item-left">Micphone</span>
                         <div className="settings-item-right">
                             <Select value={this.state.selectedAudioDevice} style={{ width: 350 }} onChange={this.handleAudioDeviceChange}>
