@@ -191,7 +191,7 @@ class App extends React.Component {
   };
 
   _showOrHideChatNotificationDot = show => {
-      this.setState({showNotificationDot: show});
+      this.setState({showChatNotificationDot: show});
   };
 
   _openOrCloseLeftContainer = collapsed => {
