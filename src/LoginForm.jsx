@@ -25,8 +25,8 @@ class LoginForm extends React.Component {
       console.log('localStorage:' + roomId + ' ' + displayName);
     }
 
-    if (params && params.hasOwnProperty('room')) {
-      roomId = params.room;
+    if (params && params.hasOwnProperty('table')) {
+      roomId = params.table;
     }
 
     form.setFieldsValue({
