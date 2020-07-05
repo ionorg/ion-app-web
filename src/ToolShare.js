@@ -20,7 +20,7 @@ export default class ToolShare extends React.Component {
 
         let loginInfo = this.props.loginInfo;
         let host = window.location.host;
-        let url = window.location.protocol + "//" + host + "/?room=" + loginInfo.roomId;
+        let url = window.location.protocol + "//" + host + "/?table=" + loginInfo.roomId;
         this.setState({ url });
     }
     handleOk = (e) => {

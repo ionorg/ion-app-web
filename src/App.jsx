@@ -143,7 +143,7 @@ class App extends React.Component {
 
     this._notification(
         "Connected!",
-        "Welcome to the ion room => " + values.roomId
+        "Welcome to Coffeebeans Cafe  (" + values.roomId + ")"
     );
     await this.conference.handleLocalStream(true);
   }
@@ -191,7 +191,7 @@ class App extends React.Component {
   };
 
   _showOrHideChatNotificationDot = show => {
-      this.setState({showChatNotificationDot: show});
+    this.setState({showChatNotificationDot: show});
   };
 
   _openOrCloseLeftContainer = collapsed => {

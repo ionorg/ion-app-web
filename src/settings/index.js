@@ -242,7 +242,7 @@ export default class MediaSettings extends React.Component {
                     okText='Ok'
                     cancelText='Cancel'>
                     <div className="settings-item">
-                        <span className="settings-item-left">Micphone</span>
+                        <span className="settings-item-left">Microphone</span>
                         <div className="settings-item-right">
                             <Select value={this.state.selectedAudioDevice} style={{ width: 350 }} onChange={this.handleAudioDeviceChange}>
                                 {
