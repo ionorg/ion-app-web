@@ -43,6 +43,7 @@ class SmallVideoView extends React.Component {
         />
         <div className="small-video-id-div">
           <a className="small-video-id-a">{stream.info.name}</a>
+
         </div>
 
       </div>
