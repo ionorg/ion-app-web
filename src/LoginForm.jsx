@@ -69,6 +69,7 @@ const ConnectionStep = ({ step }) => {
 
 class LoginForm extends React.Component {
   state = DEFAULT_STATE;
+  testUpdateLoop = null;
 
   componentDidMount = () => {
     const { form } = this.props;
@@ -105,6 +106,9 @@ class LoginForm extends React.Component {
 
     setTimeout(this._testConnection, 750);
   };
+  componentWillUnmount = () => {
+    this._cleanup();
+  }
 
   _notification = (message, description) => {
     notification.info({
@@ -132,6 +136,17 @@ class LoginForm extends React.Component {
     }
   };
 
+  _cleanup = async () => {
+    if (testUpdateLoop)
+      clearInterval(testUpdateLoop);
+    if (this.stream) {
+      await this._stopMediaStream(this.stream);
+      await this.stream.unpublish();
+    }
+    await this.client.leave();
+
+  };
+
   _testConnection = async () => {
 
     this._testStep('biz', 'pending');
@@ -139,17 +154,10 @@ class LoginForm extends React.Component {
     let testUpdateLoop = null;
 
 
-    window.onunload = async () => {
-      if (testUpdateLoop)
-        clearInterval(testUpdateLoop);
-      if (this.stream) {
-        await this._stopMediaStream(this.stream);
-        await this.stream.unpublish();
-      }
-      await this.client.leave();
-
-    };
-
+    window.onunload = () => {
+      cleanup()
+    }
+    
     client.on("transport-open", async () => {
       this._testStep('biz', 'connected', client.url);
       this._testStep('lobby', 'pending');
@@ -186,7 +194,6 @@ class LoginForm extends React.Component {
 
         try {
           for (let track of localStream.getTracks()) {
-            console.log(track)
             tracks[`${mid} ${track.id}`] = {
               codec: track.codec,
               fmtp: "",
