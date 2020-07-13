@@ -1,11 +1,7 @@
-# ion-app-web
+# Cafe CoffeeBeans
+https://cafe.coffeebeans.io
 
-ion web app
-
-### Screenshots
-
-<img width="360" height="265" src=".github/screenshots/ion-01.jpg"/> <img width="360" height="265" src=".github/screenshots/ion-02.jpg"/>
-<img width="360" height="265" src=".github/screenshots/ion-04.jpg"/> <img width="360" height="265" src=".github/screenshots/ion-05.jpg"/>
+The inhouse video conferencing tool for added security and branding. It is built using Pion Webrtc.
 
 ### Docker
 
@@ -29,12 +25,7 @@ Make sure these ports are exposed publicly
 443/tcp
 ```
 
-Configure your domain.
-
-```
-export WWW_URL=yourdomain
-export ADMIN_EMAIL=yourname@yourdomain
-```
+Configure your domain for production deployment. WWW_URL and ADMIN_EMAIL.
 
 These variables can also be set in the `docker-compose.yml`.
 
@@ -46,11 +37,8 @@ Bring up docker with
 docker-compose up --build
 ```
 
-Open this url with chrome
+Open your domain url with chrome
 
-```
-https://yourdomain
-```
 
 ### Local Dev
 
@@ -71,3 +59,8 @@ npm start
 ```
 
 Serves on `https://localhost:8080`
+
+### App wishlist
+
+Find the app wishlist below to help contribute:
+https://trello.com/b/kbghnOxw/videoconfappwishlist
