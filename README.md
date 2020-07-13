@@ -59,3 +59,8 @@ npm start
 ```
 
 Serves on `https://localhost:8080`
+
+### App wishlist
+
+Find the app wishlist below to help contribute:
+https://trello.com/b/kbghnOxw/videoconfappwishlist
