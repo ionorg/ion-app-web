@@ -104,8 +104,8 @@ class LoginForm extends React.Component {
       'audioOnly': audioOnly,
     });
 
-    setTimeout(this._testConnection, 750);
   };
+
   componentWillUnmount = () => {
     this._cleanup();
   }
@@ -143,12 +143,12 @@ class LoginForm extends React.Component {
       await this._stopMediaStream(this.stream);
       await this.stream.unpublish();
     }
-    await this.client.leave();
-
+    if (this.client)
+      await this.client.leave();
   };
 
   _testConnection = async () => {
-
+    this.setState({test: true})
     this._testStep('biz', 'pending');
     let client = this.props.createClient();
     let testUpdateLoop = null;
@@ -320,10 +320,14 @@ class LoginForm extends React.Component {
           </Form.Item>
         </Form>
         <center>
-          <ConnectionStep step={steps.biz} />
-          <ConnectionStep step={steps.lobby} />
-          <ConnectionStep step={steps.publish} />
-          <ConnectionStep step={steps.subscribe} />
+          {this.state.test ?
+          <>
+            <ConnectionStep step={steps.biz} />
+            <ConnectionStep step={steps.lobby} />
+            <ConnectionStep step={steps.publish} />
+            <ConnectionStep step={steps.subscribe} />
+          </>
+          : <Button onClick={() => this._testConnection()}>Test Connection</Button>}
         </center>
       </>
     );
