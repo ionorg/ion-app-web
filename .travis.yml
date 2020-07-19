@@ -1,16 +1,4 @@
 dist: bionic
-language: javascript
-
-cache:
-  directories:
-    - node_modules
-  npm: true
-  yarn: true
-
-_build_job: &build_job
-  env: CACHE_NAME=build
-  script:
-    - yarn build
 
 _e2e_tests: &e2e_tests
   env: 
