@@ -158,6 +158,9 @@ class App extends React.Component {
         console.log("OK");
         await this2._cleanUp();
         this2.setState({login: false});
+        setTimeout(()=>{
+          window.location = '/'
+        },0);
       },
       onCancel() {
         console.log("Cancel");
