@@ -300,7 +300,11 @@ class App extends React.Component {
       localVideoEnabled,
       screenSharingEnabled,
       collapsed,
-      vidFit
+      vidFit,
+      isFullScreen,
+      loginInfo,
+      messages,
+      showChatNotificationDot,
     } = this.state;
     return (
         <Layout className="app-layout">
@@ -381,7 +385,7 @@ class App extends React.Component {
                       />
                     </Button>
                   </Tooltip>
-                  <ToolShare loginInfo={this.state.loginInfo}/>
+                  <ToolShare loginInfo={loginInfo}/>
                 </div>
             ) : (
                 <div/>
@@ -402,16 +406,16 @@ class App extends React.Component {
                       collapsedWidth={0}
                       trigger={null}
                       collapsible
-                      collapsed={this.state.collapsed}>
+                      collapsed={collapsed}>
                     <div className="left-container">
-                      <ChatFeed messages={this.state.messages}
+                      <ChatFeed messages={messages}
                                 onSendMessage={this._onSendMessage}/>
                     </div>
                   </Sider>
                   <Layout className="app-right-layout">
                     <Content style={{flex: 1}}>
                       <Conference
-                          collapsed={this.state.collapsed}
+                          collapsed={collapsed}
                           client={this.client}
                           settings={this._settings}
                           localAudioEnabled={localAudioEnabled}
@@ -424,11 +428,9 @@ class App extends React.Component {
                     </Content>
                     <div className="app-collapsed-button">
                       <Tooltip title='Open/Close chat panel'>
-                        <Badge
-                            count={this.state.showChatNotificationDot ? 1 : 0}
-                            dot>
+                        <Badge count={showChatNotificationDot ? 1 : 0} >
                           <Button
-                              icon={this.state.collapsed ? "right" : "left"}
+                              icon={collapsed ? "wechat" : "wechat"}
                               size="large"
                               shape="circle"
                               onClick={() => this._openOrCloseLeftContainer(
@@ -440,7 +442,7 @@ class App extends React.Component {
                     <div className="app-fullscreen-layout">
                       <Tooltip title='Fit/Stretch Video'>
                         <Button
-                            icon={this.state.vidFit ? "minus-square"
+                            icon={vidFit ? "minus-square"
                                 : "plus-square"}
                             size="large"
                             shape="circle"
@@ -449,7 +451,7 @@ class App extends React.Component {
                       </Tooltip>
                       <Tooltip title='Fullscreen/Exit'>
                         <Button
-                            icon={this.state.isFullScreen ? "fullscreen-exit"
+                            icon={isFullScreen ? "fullscreen-exit"
                                 : "fullscreen"}
                             size="large"
                             shape="circle"
