@@ -27,6 +27,7 @@ import Conference from "./Conference";
 import LoginForm from "./LoginForm";
 import MediaSettings from './settings';
 import ToolShare from './ToolShare';
+import notificationSound from './assets/insight.mp3';
 
 const {confirm} = Modal;
 const {Header, Content, Footer, Sider} = Layout;
@@ -56,6 +57,8 @@ class App extends React.Component {
       codec: "vp8",
       isDevMode: false,
     };
+
+    this.notificationSound = new Audio(notificationSound);
 
     let settings = reactLocalStorage.getObject("settings");
     if (settings.codec !== undefined) {
@@ -96,6 +99,8 @@ class App extends React.Component {
 
     client.on("peer-join", (id, info) => {
       this._notification(info.name + " Joined!", "");
+      this.notificationSound.currentTime = 0;
+      this.notificationSound.play();
     });
 
     client.on("peer-leave", (id) => {
