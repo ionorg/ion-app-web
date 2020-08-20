@@ -83,6 +83,7 @@ class App extends React.Component {
   _handleJoin = async values => {
     this.setState({loading: true});
 
+  _createClient = () => {
     let url = "wss://" + window.location.host;
     //for dev by scripts
     if (process.env.NODE_ENV === "development") {
@@ -90,8 +91,16 @@ class App extends React.Component {
       url = proto + "://" + window.location.host;
     }
 
-    console.log("WS url is:" + url);
     let client = new Client({url: url});
+    client.url = url;
+
+    return client
+  }
+
+  _handleJoin = async values => {
+    this.setState({ loading: true });
+
+    let client = this._createClient();
 
     window.onunload = async () => {
       await this._cleanUp();
@@ -466,13 +475,13 @@ class App extends React.Component {
                       </Tooltip>
                     </div>
 
-                  </Layout>
-                </Layout>
-            ) : loading ? (
-                <Spin size="large" tip="Connecting..."/>
-            ) : (
-                <Card title="Join a table" className="app-login-card">
-                  <LoginForm handleLogin={this._handleJoin}/>
+              </Layout>
+            </Layout>
+          ) : loading ? (
+            <Spin size="large" tip="Connecting..." />
+          ) : (
+                <Card title="Join to Ion" className="app-login-card">
+                  <LoginForm handleLogin={this._handleJoin} createClient={this._createClient} />
                 </Card>
             )}
           </Content>

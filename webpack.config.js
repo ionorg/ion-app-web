@@ -1,11 +1,8 @@
-const webpack = require('webpack');
 const path = require('path');
-const copyWebpackPlugin = require('copy-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
-
-module.exports = function(env) {
+module.exports = (env) => {
   const isEnvProduction = !!env && env.production;
   console.log('Production: ', isEnvProduction);
 
@@ -70,7 +67,6 @@ module.exports = function(env) {
   ],
   devServer: {
     hot: true,
-    host: 'localhost',
     proxy: {
       '/ws': {
          target: 'ws://localhost:8443',
