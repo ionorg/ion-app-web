@@ -15,7 +15,7 @@ export default class ChatFeed extends Component {
     }
   }
 
-  scrollToBottom = () => {
+  _scrollToBottom = () => {
     const { chat } = this.refs;
     if(chat !== undefined){
       const scrollHeight = chat.scrollHeight;
@@ -25,7 +25,7 @@ export default class ChatFeed extends Component {
     }
   }
 
-  renderGroup = (messages, index, id) => {
+  _renderGroup = (messages, index, id) => {
     let group = []
 
     for (let i = index; messages[i] ? messages[i].id == id : false; i--) {
@@ -47,13 +47,13 @@ export default class ChatFeed extends Component {
     )
   }
 
-  renderMessages = (messages) => {
+  _renderMessages = (messages) => {
     var message_nodes = messages.map((curr, index) => {
       if (
         (messages[index + 1] ? false : true) ||
         messages[index + 1].id != curr.id
       ) {
-        return this.renderGroup(messages, index, curr.id)
+        return this._renderGroup(messages, index, curr.id)
       }
     })
     return message_nodes
@@ -61,7 +61,7 @@ export default class ChatFeed extends Component {
 
   render() {
     window.setTimeout(() => {
-      this.scrollToBottom()
+      this._scrollToBottom()
     }, 10)
 
     return (
@@ -73,7 +73,7 @@ export default class ChatFeed extends Component {
 
         <div ref="chat" className='chat-history'>
           <div>
-            {this.renderMessages(this.props.messages)}
+            {this._renderMessages(this.props.messages)}
           </div>
         </div>
         <ChatInput onSendMessage={this.props.onSendMessage}/>

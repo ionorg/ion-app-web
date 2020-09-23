@@ -91,10 +91,12 @@ class App extends React.Component {
 
     client.on("peer-join", (id, info) => {
       this._notification("Peer Join", "peer => " + info.name + ", join!");
+      this._onSystemMessage(info.name + ", join!");
     });
 
     client.on("peer-leave", (id) => {
       this._notification("Peer Leave", "peer => " + id + ", leave!");
+      this._onSystemMessage(info.name + ", leave!");
     });
 
     client.on("transport-open", () => {
@@ -270,6 +272,13 @@ class App extends React.Component {
     let messages = this.state.messages;
     let uid = 0;
     messages.push(new Message({ id: uid, message: data, senderName: 'me' }));
+    this.setState({ messages });
+  }
+
+  _onSystemMessage = (msg) => {
+    let messages = this.state.messages;
+    let uid = 2;
+    messages.push(new Message({ id: uid, message: msg, senderName: 'System' }));
     this.setState({ messages });
   }
 
