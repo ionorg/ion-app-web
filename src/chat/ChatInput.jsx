@@ -21,7 +21,6 @@ export default class ChatInput extends Component {
     this.sendMessage();
   }
 
-
   onInputKeyUp = (event) => {
     if (event.keyCode == 13) {
       this.sendMessage();
@@ -46,7 +45,6 @@ export default class ChatInput extends Component {
   render() {
     return (
         <div className='chat-input'>
-
           <Input
               placeholder='Please input message'
               onChange={this.onInputChange}

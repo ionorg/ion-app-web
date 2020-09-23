@@ -5,15 +5,11 @@ import UserIcon from "mdi-react/UserIcon";
 export default class ChatBubble extends Component {
   constructor(props) {
     super()
-    
     this.state = {message: props.message};
   }
 
-  componentDidMount() {}
-
   render() {
-
-
+    //Other
     if (this.props.message.id == 1){
       return (
           <div className='bubble-left'>
@@ -31,6 +27,7 @@ export default class ChatBubble extends Component {
           </div>
       )
     }
+    //Self message
     else if(this.props.message.id == 0){
       return (
           <div className='bubble-right'>
@@ -51,10 +48,10 @@ export default class ChatBubble extends Component {
           </div>
       )
     }
+    //System message
     else if(this.props.message.id == 2){
         return (
             <div className='bubble-middle'>
-
                 <div className='bubble-msg'>
                     <div className='bubble-msgword-middle'>
                         <p className='pm'>
