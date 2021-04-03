@@ -1,10 +1,8 @@
 import React from "react";
 import { Spin, notification } from "antd";
 import { LocalVideoView, MainVideoView, SmallVideoView } from "./videoview";
-import { Client, RemoteStream } from 'ion-sdk-js';
 import "../styles/css/conference.scss";
-import { IonConnector,LocalStream } from "ion-sdk-js/lib/ion";
-import { v4 as uuidv4 } from 'uuid';
+import { LocalStream } from "ion-sdk-js/lib/ion";
 
 class Conference extends React.Component {
   constructor() {
@@ -20,8 +18,6 @@ class Conference extends React.Component {
 
   componentDidMount = () => {
     const { connector } = this.props;
-    // client.on("stream-add", this._handleAddStream);
-    // client.on("stream-remove", this._handleRemoveStream);
     this.handleLocalStream(true);
 
     let streams = this.state.streams;
@@ -30,41 +26,19 @@ class Conference extends React.Component {
       if (track.kind === "video") {
         track.onunmute = () => {
           if (!streams[stream.id]) {
-            // remoteVideo = document.createElement("video");
-            // remoteVideo.srcObject = stream;
-            // remoteVideo.autoplay = true;
-            // remoteVideo.muted = true;
-
-            // remotesDiv.appendChild(remoteVideo);
-            // stream.onremovetrack = () => {
-            //   remotesDiv.removeChild(remoteVideo);
-            //   streams[stream.id] = null;
-            // };
-
             stream.info = {'name':'xxxx'};
-            //console.log(mid, info, stream)
             streams.push({ mid: stream.mid, stream, sid: stream.mid });
             this.setState({ streams });
+
+            stream.onremovetrack = () => {
+              let streams = this.state.streams;
+              streams = streams.filter(item => item.sid !== stream.mid);
+              this.setState({ streams });
+            };
           }
         };
       }
     };
-
-
-    // const { client } = this.props;
-    // let streams = this.state.streams;
-    // let stream = await client.subscribe(mid);
-    // stream.info = info;
-    // console.log(mid, info, stream)
-    // streams.push({ mid: stream.mid, stream, sid: mid });
-    // this.setState({ streams });
-
-  };
-
-  componentWillUnmount = () => {
-    const { client } = this.props;
-    client.off("stream-add", this._handleAddStream);
-    client.off("stream-remove", this._handleRemoveStream);
   };
 
   cleanUp = async () => {
@@ -87,7 +61,6 @@ class Conference extends React.Component {
   };
 
   _unpublish = async stream => {
-    const { client } = this.props;
     if (stream) {
       await this._stopMediaStream(stream);
       await stream.unpublish();
@@ -115,8 +88,6 @@ class Conference extends React.Component {
 
   handleLocalStream = async (enabled) => {
     const {connector} = this.props;
-    const streams = {};
-    //let localStream;
     let { localStream } = this.state;
 
     LocalStream.getUserMedia({
@@ -125,13 +96,7 @@ class Conference extends React.Component {
     })
       .then((media) => {
         localStream = media;
-        // localVideo.srcObject = media;
-        // localVideo.autoplay = true;
-        // localVideo.controls = true;
-        // localVideo.muted = true;
-        // joinBtns.style.display = "none";
         connector.sfu.publish(media);
-
         this.setState({ localStream });
       })
       .catch(console.error);
@@ -170,28 +135,28 @@ class Conference extends React.Component {
   // };
 
   handleScreenSharing = async enabled => {
-    let { localScreen } = this.state;
-    const { client, settings } = this.props;
-    if (enabled) {
-      localScreen = await LocalStream.getDisplayMedia({
-        codec: settings.codec.toUpperCase(),
-        resolution: settings.resolution,
-        bandwidth: settings.bandwidth,
-      });
-      await client.publish(localScreen);
-      let track = localScreen.getVideoTracks()[0];
-      if (track) {
-        track.addEventListener("ended", () => {
-          this.handleScreenSharing(false);
-        });
-      }
-    } else {
-      if (localScreen) {
-        this._unpublish(localScreen);
-        localScreen = null;
-      }
-    }
-    this.setState({ localScreen });
+    // let { localScreen } = this.state;
+    // const { client, settings } = this.props;
+    // if (enabled) {
+    //   localScreen = await LocalStream.getDisplayMedia({
+    //     codec: settings.codec.toUpperCase(),
+    //     resolution: settings.resolution,
+    //     bandwidth: settings.bandwidth,
+    //   });
+    //   await client.publish(localScreen);
+    //   let track = localScreen.getVideoTracks()[0];
+    //   if (track) {
+    //     track.addEventListener("ended", () => {
+    //       this.handleScreenSharing(false);
+    //     });
+    //   }
+    // } else {
+    //   if (localScreen) {
+    //     this._unpublish(localScreen);
+    //     localScreen = null;
+    //   }
+    // }
+    // this.setState({ localScreen });
   };
 
   _stopMediaStream = async (stream) => {
@@ -199,22 +164,6 @@ class Conference extends React.Component {
     for (let i = 0, len = tracks.length; i < len; i++) {
       await tracks[i].stop();
     }
-  };
-
-  _handleAddStream = async (mid, info) => {
-    const { client } = this.props;
-    let streams = this.state.streams;
-    let stream = await client.subscribe(mid);
-    stream.info = info;
-    console.log(mid, info, stream)
-    streams.push({ mid: stream.mid, stream, sid: mid });
-    this.setState({ streams });
-  };
-
-  _handleRemoveStream = async (stream) => {
-    let streams = this.state.streams;
-    streams = streams.filter(item => item.sid !== stream.mid);
-    this.setState({ streams });
   };
 
   _onChangeVideoPosition = data => {
@@ -245,7 +194,7 @@ class Conference extends React.Component {
   };
 
   render = () => {
-    const { client, vidFit } = this.props;
+    const { vidFit } = this.props;
     const {
       streams,
       localStream,
@@ -253,8 +202,7 @@ class Conference extends React.Component {
       audioMuted,
       videoMuted
     } = this.state;
-    //const id = client.uid;
-    const id = this.props.id;
+    const id = this.props.uid;
     return (
       <div className="conference-layout">
         {streams.length === 0 && (
@@ -274,7 +222,6 @@ class Conference extends React.Component {
               <LocalVideoView
                 id={id + "-video"}
                 label="Local Stream"
-                client={client}
                 stream={localStream}
                 audioMuted={audioMuted}
                 videoMuted={videoMuted}
@@ -287,7 +234,6 @@ class Conference extends React.Component {
               <LocalVideoView
                 id={id + "-screen"}
                 label="Screen Sharing"
-                client={client}
                 stream={localScreen}
                 audioMuted={false}
                 videoMuted={false}

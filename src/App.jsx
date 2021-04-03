@@ -19,7 +19,7 @@ import "../styles/css/app.scss";
 
 import LoginForm from "./LoginForm";
 import Conference from "./Conference";
-import { IonConnector,LocalStream } from "ion-sdk-js/lib/ion";
+import { IonConnector } from "ion-sdk-js/lib/ion";
 import { v4 as uuidv4 } from 'uuid';
 
 class App extends React.Component {
@@ -36,9 +36,7 @@ class App extends React.Component {
       vidFit: false,
       loginInfo: {},
       messages: [],
-
-      id:'',
-
+      uid:'',
     };
 
     this._settings = {
@@ -59,7 +57,7 @@ class App extends React.Component {
 
   _cleanUp = async () => {
     await this.conference.cleanUp();
-    await this.client.leave();
+    //await this.client.leave();
   };
 
   _notification = (message, description) => {
@@ -70,114 +68,48 @@ class App extends React.Component {
     });
   };
 
-  _createClient = () => {
-    let url = "wss://" + window.location.host;
-    //for dev by scripts
-    if(process.env.NODE_ENV == "development"){
-      const proto = this._settings.isDevMode ? "ws" : "wss"
-      url = proto + "://" + window.location.host;
-    }
-
-    let client = new Client({url: url});
-    client.url = url;
-
-    return client
-  }
-
-  _handleJoin = async values => {
+  _handleJoin = async (values) => {
     this.setState({ loading: true });
 
-    
     let connector = new IonConnector("http://localhost:5551");
     this.connector = connector;
       let uid = uuidv4();
-      console.log("连接:http://localhost:5551");
+      console.log("Connect url:http://localhost:5551");
 
       connector.onjoin = (success, reason) => {
         console.log("onjoin: ", success, ", ", reason);
-        //connector.message(uid,  "all", { text: "hello"});
-
-        this.setState({
-          login: true,
-          loading: false,
-          id:uid,
-          // loginInfo: values,
-          // localVideoEnabled: !values.audioOnly,
-        });
-
+        this._onJoin(values,uid);
       };
       connector.join("test room", uid, {name: 'ts client'});
       
+    connector.onleave = (reason) => {
+      console.log("onleave: ", reason);
+    };
 
-    
-      //this._openConference();
-      //await this.conference.handleLocalStream(true);
+    connector.onpeerevent = (ev) => {
+       console.log("onpeerevent: state = ", ev.state, ", peer = ", ev.peer.uid, ", name = ", ev.peer.info.name);
+    };
 
+    connector.onstreamevent = function(ev) {
+       console.log("onstreamevent: state = ", ev.state, ", sid = ", ev.sid,", uid = ", ev.uid);
+    };
 
+    connector.onmessage = function(msg) {
+      console.log("onmessage: from ", msg.from,", to ", msg.to, ", text = ", msg.data.text);
+    }
 
-
-    // let client = this._createClient();
-
-    // window.onunload = async () => {
-    //   await this._cleanUp();
-    // };
-
-    // client.on("peer-join", (id, info) => {
-    //   this._notification("Peer Join", "peer => " + info.name + ", join!");
-    //   this._onSystemMessage(info.name + ", join!");
-    // });
-
-    // client.on("peer-leave", (id) => {
-    //   this._notification("Peer Leave", "peer => " + id + ", leave!");
-    //   this._onSystemMessage(info.name + ", leave!");
-    // });
-
-    // client.on("transport-open", () => {
-    //   console.log("transport open!");
-    //   this._handleTransportOpen(values);
-    // });
-
-    // client.on("transport-closed", () => {
-    //   console.log("transport closed!");
-    // });
-
-    // client.on("stream-add", (id, info) => {
-    //   console.log("stream-add %s,%s!", id, info);
-    //   this._notification(
-    //     "Stream Add",
-    //     "id => " + id + ", name => " + info.name
-    //   );
-    // });
-
-    // client.on("stream-remove", (stream) => {
-    //   console.log("stream-remove %s,%", stream.id);
-    //   this._notification("Stream Remove", "id => " + stream.id);
-    // });
-
-    // client.on("broadcast", (mid, info) => {
-    //   console.log("broadcast %s,%s!", mid,info);
-    //   this._onMessageReceived(info);
-    // });
-
-    // this.client = client;
+    window.onunload = async () => {
+      await this._cleanUp();
+    };
   };
 
- 
-  // _openConference = async () => {
-  //   await this.conference.handleLocalStream(true);
-  // }
-
-
-
-
-
-  _handleTransportOpen = async (values) => {
+  _onJoin = async (values,uid) => {
     reactLocalStorage.remove("loginInfo");
     reactLocalStorage.setObject("loginInfo", values);
-    await this.client.join(values.roomId, { name: values.displayName });
     this.setState({
       login: true,
       loading: false,
+      uid:uid,
       loginInfo: values,
       localVideoEnabled: !values.audioOnly,
     });
@@ -186,11 +118,9 @@ class App extends React.Component {
       "Connected!",
       "Welcome to the ion room => " + values.roomId
     );
-    await this.conference.handleLocalStream(true);
   }
 
   _handleLeave = async () => {
-    let client = this.client;
     let this2 = this;
     confirm({
       title: "Leave Now?",
@@ -436,9 +366,8 @@ class App extends React.Component {
               <Layout className="app-right-layout">
                 <Content style={{ flex: 1 }}>
                   <Conference
-                    id={this.state.uid}
+                    uid={this.state.uid}
                     collapsed={this.state.collapsed}
-                    client={this.client}
                     connector={this.connector}
                     settings={this._settings}
                     localAudioEnabled={localAudioEnabled}

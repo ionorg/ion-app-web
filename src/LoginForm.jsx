@@ -5,20 +5,13 @@ import { reactLocalStorage } from "reactjs-localstorage";
 import "../styles/css/login.scss";
 
 import CheckIcon from "mdi-react/CheckIcon";
-import ShuffleIcon from "mdi-react/ShuffleIcon";
-import NetworkIcon from "mdi-react/NetworkIcon";
 import ServerNetworkIcon from "mdi-react/ServerNetworkIcon";
 import GoogleClassroomIcon from "mdi-react/GoogleClassroomIcon";
 import ProgressClockIcon from "mdi-react/ProgressClockIcon";
 import ProgressAlertIcon from "mdi-react/ProgressAlertIcon";
 import ProgressCloseIcon from "mdi-react/ProgressCloseIcon";
-import VideoCheckIcon from "mdi-react/VideoCheckIcon";
 import UploadLockIcon from "mdi-react/UploadLockIcon";
-import SwapVerticalIcon from "mdi-react/SwapVerticalIcon";
 import DownloadLockIcon from "mdi-react/DownloadLockIcon";
-
-
-
 
 const TEST_STEPS = {
   biz: { title: 'Biz Websocket', icon: <ServerNetworkIcon /> },
