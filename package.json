@@ -5,7 +5,8 @@
   "main": "src/index.jsx",
   "scripts": {
     "build": "webpack --mode=production --config webpack.config.js --env.production",
-    "start": "webpack-dev-server --config ./webpack.config.js --mode development --open --https --cert ./configs/certs/cert.pem --key  ./configs/certs/key.pem"
+    "start": "webpack-dev-server --config ./webpack.config.js --mode development --open --http",
+    "start_https": "webpack-dev-server --config ./webpack.config.js --mode development --open --https --cert ./configs/certs/cert.pem --key  ./configs/certs/key.pem"
   },
   "author": "pion",
   "license": "MIT",
@@ -34,7 +35,7 @@
   "dependencies": {
     "antd": "^3.26.16",
     "copy-webpack-plugin": "^5.0.5",
-    "ion-sdk-js": "^0.3.7",
+    "ion-sdk-js": "git://github.com/pion/ion-sdk-js.git",
     "mdi-react": "^6.4.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",

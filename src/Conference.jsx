@@ -1,8 +1,10 @@
 import React from "react";
 import { Spin, notification } from "antd";
 import { LocalVideoView, MainVideoView, SmallVideoView } from "./videoview";
-import { Client, LocalStream, RemoteStream } from 'ion-sdk-js';
+import { Client, RemoteStream } from 'ion-sdk-js';
 import "../styles/css/conference.scss";
+import { IonConnector,LocalStream } from "ion-sdk-js/lib/ion";
+import { v4 as uuidv4 } from 'uuid';
 
 class Conference extends React.Component {
   constructor() {
@@ -17,9 +19,46 @@ class Conference extends React.Component {
   }
 
   componentDidMount = () => {
-    const { client } = this.props;
-    client.on("stream-add", this._handleAddStream);
-    client.on("stream-remove", this._handleRemoveStream);
+    const { connector } = this.props;
+    // client.on("stream-add", this._handleAddStream);
+    // client.on("stream-remove", this._handleRemoveStream);
+    this.handleLocalStream(true);
+
+    let streams = this.state.streams;
+    connector.ontrack = (track, stream) => {
+      console.log("got track", track.id, "for stream", stream.id);
+      if (track.kind === "video") {
+        track.onunmute = () => {
+          if (!streams[stream.id]) {
+            // remoteVideo = document.createElement("video");
+            // remoteVideo.srcObject = stream;
+            // remoteVideo.autoplay = true;
+            // remoteVideo.muted = true;
+
+            // remotesDiv.appendChild(remoteVideo);
+            // stream.onremovetrack = () => {
+            //   remotesDiv.removeChild(remoteVideo);
+            //   streams[stream.id] = null;
+            // };
+
+            stream.info = {'name':'xxxx'};
+            //console.log(mid, info, stream)
+            streams.push({ mid: stream.mid, stream, sid: stream.mid });
+            this.setState({ streams });
+          }
+        };
+      }
+    };
+
+
+    // const { client } = this.props;
+    // let streams = this.state.streams;
+    // let stream = await client.subscribe(mid);
+    // stream.info = info;
+    // console.log(mid, info, stream)
+    // streams.push({ mid: stream.mid, stream, sid: mid });
+    // this.setState({ streams });
+
   };
 
   componentWillUnmount = () => {
@@ -73,37 +112,62 @@ class Conference extends React.Component {
     }
   };
 
+
   handleLocalStream = async (enabled) => {
+    const {connector} = this.props;
+    const streams = {};
+    //let localStream;
     let { localStream } = this.state;
-    const { client, settings } = this.props;
-    console.log(settings)
-    try {
-      if (enabled) {
-        localStream = await LocalStream.getUserMedia({
-          codec: settings.codec.toUpperCase(),
-          resolution: settings.resolution,
-          bandwidth: settings.bandwidth,
-          audio: true,
-          video: true,
-        });
-        await client.publish(localStream);
-      } else {
-        if (localStream) {
-          this._unpublish(localStream);
-          localStream = null;
-        }
-      }
-      console.log("local stream", localStream.getTracks())
-      this.setState({ localStream });
-    } catch (e) {
-      console.log("handleLocalStream error => " + e);
-      // this._notification("publish/unpublish failed!", e);
-    }
 
-    //Check audio only conference
-    this.muteMediaTrack("video", this.props.localVideoEnabled);
+    LocalStream.getUserMedia({
+      resolution: "vga",
+      audio: true,
+    })
+      .then((media) => {
+        localStream = media;
+        // localVideo.srcObject = media;
+        // localVideo.autoplay = true;
+        // localVideo.controls = true;
+        // localVideo.muted = true;
+        // joinBtns.style.display = "none";
+        connector.sfu.publish(media);
 
+        this.setState({ localStream });
+      })
+      .catch(console.error);
   };
+
+  // handleLocalStream = async (enabled) => {
+  //   let { localStream } = this.state;
+  //   const { client, settings } = this.props;
+  //   console.log(settings)
+  //   try {
+  //     if (enabled) {
+  //       localStream = await LocalStream.getUserMedia({
+  //         codec: settings.codec.toUpperCase(),
+  //         resolution: settings.resolution,
+  //         bandwidth: settings.bandwidth,
+  //         audio: true,
+  //         video: true,
+  //       });
+  //       await client.publish(localStream);
+  //     } else {
+  //       if (localStream) {
+  //         this._unpublish(localStream);
+  //         localStream = null;
+  //       }
+  //     }
+  //     console.log("local stream", localStream.getTracks())
+  //     this.setState({ localStream });
+  //   } catch (e) {
+  //     console.log("handleLocalStream error => " + e);
+  //     // this._notification("publish/unpublish failed!", e);
+  //   }
+
+  //   //Check audio only conference
+  //   this.muteMediaTrack("video", this.props.localVideoEnabled);
+
+  // };
 
   handleScreenSharing = async enabled => {
     let { localScreen } = this.state;
@@ -189,7 +253,8 @@ class Conference extends React.Component {
       audioMuted,
       videoMuted
     } = this.state;
-    const id = client.uid;
+    //const id = client.uid;
+    const id = this.props.id;
     return (
       <div className="conference-layout">
         {streams.length === 0 && (
