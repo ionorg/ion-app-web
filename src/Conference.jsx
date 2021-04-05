@@ -26,13 +26,23 @@ class Conference extends React.Component {
       if (track.kind === "video") {
         track.onunmute = () => {
           if (!streams[stream.id]) {
-            stream.info = {'name':stream.id.substring(0,8)};
-            streams.push({ mid: stream.mid, stream, sid: stream.mid });
+
+            console.log("stream.id:::" + stream.id);
+            let name = 'Guest';
+            let peers = this.props.peers;
+            peers.forEach((item) => {
+              if(item.id == stream.id){
+                name = item.name;
+              }
+            });
+            
+            stream.info = {'name':name};
+            streams.push({ id:stream.id, stream });
             this.setState({ streams });
 
             stream.onremovetrack = () => {
               let streams = this.state.streams;
-              streams = streams.filter(item => item.sid !== stream.mid);
+              streams = streams.filter(item => item.id !== stream.id);
               this.setState({ streams });
             };
           }

@@ -19,7 +19,7 @@ import "../styles/css/app.scss";
 
 import LoginForm from "./LoginForm";
 import Conference from "./Conference";
-import { IonConnector } from "ion-sdk-js/lib/ion";
+import { IonConnector, PeerState } from "ion-sdk-js/lib/ion";
 import { v4 as uuidv4 } from 'uuid';
 
 class App extends React.Component {
@@ -37,6 +37,7 @@ class App extends React.Component {
       loginInfo: {},
       messages: [],
       uid:'',
+      peers:[],
     };
 
     this._settings = {
@@ -80,7 +81,7 @@ class App extends React.Component {
         console.log("onjoin: ", success, ", ", reason);
         this._onJoin(values,uid);
       };
-      connector.join("test room", uid, {name: 'ts client'});
+      connector.join(values.roomId, uid, {name: values.displayName});
       
     connector.onleave = (reason) => {
       console.log("onleave: ", reason);
@@ -88,13 +89,42 @@ class App extends React.Component {
 
     connector.onpeerevent = (ev) => {
        console.log("onpeerevent: state = ", ev.state, ", peer = ", ev.peer.uid, ", name = ", ev.peer.info.name);
+       let peerInfo = {
+         'uid':ev.peer.uid,
+         'name':ev.peer.info.name,
+         'state':ev.state,
+        };
+        let peers = this.state.peers;
+        let find = false;
+        peers.forEach((item) => {
+          if(item.uid == ev.peer.uid){
+            item = peerInfo;
+            find = true;
+          }
+        });
+        if(!find){
+          peers.push(peerInfo);
+        }
+        this.setState({
+          peers:peers,
+        });
     };
 
-    connector.onstreamevent = function(ev) {
+    connector.onstreamevent = (ev) => {
        console.log("onstreamevent: state = ", ev.state, ", sid = ", ev.sid,", uid = ", ev.uid);
+       let peers = this.state.peers;
+       peers.forEach((item) => {
+         if(item.uid == ev.uid){
+          item['id'] = ev.streams[0].id;
+          console.log('ev.streams[0].id:::' + ev.streams[0].id);
+         }
+       });
+       this.setState({
+        peers:peers,
+      });
     };
 
-    connector.onmessage = function(msg) {
+    connector.onmessage = (msg) => {
       console.log("onmessage: from ", msg.from,", to ", msg.to, ", text = ", msg.data.text);
     }
 
@@ -370,6 +400,7 @@ class App extends React.Component {
                     collapsed={this.state.collapsed}
                     connector={this.connector}
                     settings={this._settings}
+                    peers={this.state.peers}
                     localAudioEnabled={localAudioEnabled}
                     localVideoEnabled={localVideoEnabled}
                     vidFit={vidFit}
