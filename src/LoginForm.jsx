@@ -62,7 +62,7 @@ const ConnectionStep = ({ step }) => {
 
 class LoginForm extends React.Component {
   state = DEFAULT_STATE;
-  testUpdateLoop = null;
+  //testUpdateLoop = null;
 
   componentDidMount = () => {
     const { form } = this.props;
@@ -130,117 +130,117 @@ class LoginForm extends React.Component {
   };
 
   _cleanup = async () => {
-    if (testUpdateLoop)
-      clearInterval(testUpdateLoop);
-    if (this.stream) {
-      await this._stopMediaStream(this.stream);
-      await this.stream.unpublish();
-    }
-    if (this.client)
-      await this.client.leave();
+    // if (testUpdateLoop)
+    //   clearInterval(testUpdateLoop);
+    // if (this.stream) {
+    //   await this._stopMediaStream(this.stream);
+    //   await this.stream.unpublish();
+    // }
+    // if (this.client)
+    //   await this.client.leave();
   };
 
   _testConnection = async () => {
-    this.setState({test: true})
-    this._testStep('biz', 'pending');
-    let client = this.props.createClient();
-    let testUpdateLoop = null;
+    // this.setState({test: true})
+    // this._testStep('biz', 'pending');
+    // let client = this.props.createClient();
+    // let testUpdateLoop = null;
 
 
-    window.onunload = () => {
-      cleanup()
-    }
+    // window.onunload = () => {
+    //   cleanup()
+    // }
     
-    client.on("transport-open", async () => {
-      this._testStep('biz', 'connected', client.url);
-      this._testStep('lobby', 'pending');
-      const rid = 'lobby-' + Math.floor(1000000 * Math.random());
-      await this.client.join(rid, { name: 'lobby-user' });
-      this._testStep('lobby', 'joined', 'room id='+rid);
-      const localStream = await LocalStream.getUserMedia({
-        codec: 'VP8',
-        resolution: 'hd',
-        bandwidth: 1024,
-        audio: true,
-        video: true,
-      });
+    // client.on("transport-open", async () => {
+    //   this._testStep('biz', 'connected', client.url);
+    //   this._testStep('lobby', 'pending');
+    //   const rid = 'lobby-' + Math.floor(1000000 * Math.random());
+    //   await this.client.join(rid, { name: 'lobby-user' });
+    //   this._testStep('lobby', 'joined', 'room id='+rid);
+    //   const localStream = await LocalStream.getUserMedia({
+    //     codec: 'VP8',
+    //     resolution: 'hd',
+    //     bandwidth: 1024,
+    //     audio: true,
+    //     video: true,
+    //   });
 
-      this._testStep('publish', 'pending');
+    //   this._testStep('publish', 'pending');
 
-      const publish = await client.publish(localStream);
+    //   const publish = await client.publish(localStream);
 
-      let nominated = null;
+    //   let nominated = null;
 
-      const testConnectionUpdateLoop = () => {
-        updateConnectionStats();
-        const subStatus = this.state.steps.subscribe.status;
-        if (subStatus === 'pending' || subStatus === 'error') {
-          trySubscribe();
-        }
-      };
-      testUpdateLoop = setInterval(testConnectionUpdateLoop, 3000);
-      setTimeout(testConnectionUpdateLoop, 150);
+    //   const testConnectionUpdateLoop = () => {
+    //     updateConnectionStats();
+    //     const subStatus = this.state.steps.subscribe.status;
+    //     if (subStatus === 'pending' || subStatus === 'error') {
+    //       trySubscribe();
+    //     }
+    //   };
+    //   testUpdateLoop = setInterval(testConnectionUpdateLoop, 3000);
+    //   setTimeout(testConnectionUpdateLoop, 150);
 
-      const trySubscribe = async () => {
-        const mid = client.local.mid;
-        let tracks = {}
+    //   const trySubscribe = async () => {
+    //     const mid = client.local.mid;
+    //     let tracks = {}
 
-        try {
-          for (let track of localStream.getTracks()) {
-            tracks[`${mid} ${track.id}`] = {
-              codec: track.codec,
-              fmtp: "",
-              id: track.id,
-              pt: client.local.transport.rtp[0].payload,
-              type: track.kind,
-            };
-          }
-        } catch (e) { console.log("No tracks yet...")}
+    //     try {
+    //       for (let track of localStream.getTracks()) {
+    //         tracks[`${mid} ${track.id}`] = {
+    //           codec: track.codec,
+    //           fmtp: "",
+    //           id: track.id,
+    //           pt: client.local.transport.rtp[0].payload,
+    //           type: track.kind,
+    //         };
+    //       }
+    //     } catch (e) { console.log("No tracks yet...")}
 
-        if (!mid) return;
-        client.knownStreams.set(mid, objToStrMap(tracks));
+    //     if (!mid) return;
+    //     client.knownStreams.set(mid, objToStrMap(tracks));
 
 
-        console.log('Trying to subscribe to ...', mid);
+    //     console.log('Trying to subscribe to ...', mid);
 
-        try {
-          let stream = await client.subscribe(mid);
-          this._testStep('subscribe', 'subscribed', 'mid: ' + mid);
+    //     try {
+    //       let stream = await client.subscribe(mid);
+    //       this._testStep('subscribe', 'subscribed', 'mid: ' + mid);
 
-        } catch (e) {
-          console.log(e)
-          this._testStep('subscribe', 'error');
-        }
+    //     } catch (e) {
+    //       console.log(e)
+    //       this._testStep('subscribe', 'error');
+    //     }
 
-      };
+    //   };
 
-      const updateConnectionStats = async () => {
-        const report = await client.local.transport.pc.getStats();
-        const stats = {};
-        for (let [name, stat] of report) {
-          stats[name] = stat;
-          if (stat.nominated) {
-            nominated = stat;
-          }
-        }
+    //   const updateConnectionStats = async () => {
+    //     const report = await client.local.transport.pc.getStats();
+    //     const stats = {};
+    //     for (let [name, stat] of report) {
+    //       stats[name] = stat;
+    //       if (stat.nominated) {
+    //         nominated = stat;
+    //       }
+    //     }
 
-        if (nominated) {
-          const latency = nominated.currentRoundTripTime;
-          const availableBitrate = nominated.availableOutgoingBitrate;
-          const info = `${localStream.getTracks().length} tracks, ${Math.floor(latency / 1000.0)}ms latency` + (
-            availableBitrate ? `, ${Math.floor(availableBitrate / 1024)}kbps available` : "");
-          this._testStep('publish', 'published', info);
-        } else {
-          this._testStep('publish', 'no candidates');
-        }
+    //     if (nominated) {
+    //       const latency = nominated.currentRoundTripTime;
+    //       const availableBitrate = nominated.availableOutgoingBitrate;
+    //       const info = `${localStream.getTracks().length} tracks, ${Math.floor(latency / 1000.0)}ms latency` + (
+    //         availableBitrate ? `, ${Math.floor(availableBitrate / 1024)}kbps available` : "");
+    //       this._testStep('publish', 'published', info);
+    //     } else {
+    //       this._testStep('publish', 'no candidates');
+    //     }
 
-      };
+    //   };
 
-      this._testStep('subscribe', 'pending');
+    //   this._testStep('subscribe', 'pending');
 
-    });
+    // });
 
-    window.test_client = this.client = client;
+    // window.test_client = this.client = client;
   };
 
   handleSubmit = e => {

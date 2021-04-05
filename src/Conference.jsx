@@ -26,7 +26,7 @@ class Conference extends React.Component {
       if (track.kind === "video") {
         track.onunmute = () => {
           if (!streams[stream.id]) {
-            stream.info = {'name':'xxxx'};
+            stream.info = {'name':stream.id.substring(0,8)};
             streams.push({ mid: stream.mid, stream, sid: stream.mid });
             this.setState({ streams });
 
@@ -87,76 +87,58 @@ class Conference extends React.Component {
 
 
   handleLocalStream = async (enabled) => {
-    const {connector} = this.props;
+    const {connector,settings} = this.props;
     let { localStream } = this.state;
 
-    LocalStream.getUserMedia({
-      resolution: "vga",
-      audio: true,
-    })
-      .then((media) => {
-        localStream = media;
-        connector.sfu.publish(media);
-        this.setState({ localStream });
+    if (enabled) {
+      LocalStream.getUserMedia({
+        codec: settings.codec.toUpperCase(),
+        resolution: settings.resolution,
+        bandwidth: settings.bandwidth,
+        audio: true,
+        video: true,
       })
-      .catch(console.error);
+        .then((media) => {
+          localStream = media;
+          connector.sfu.publish(media);
+          this.setState({ localStream });
+        })
+        .catch ((e) => {
+            console.log("handleLocalStream error => " + e);
+        });
+    }else{
+      if (localStream) {
+        this._unpublish(localStream);
+        localStream = null;
+      }
+    }
+
+      this.muteMediaTrack("video", this.props.localVideoEnabled);
   };
 
-  // handleLocalStream = async (enabled) => {
-  //   let { localStream } = this.state;
-  //   const { client, settings } = this.props;
-  //   console.log(settings)
-  //   try {
-  //     if (enabled) {
-  //       localStream = await LocalStream.getUserMedia({
-  //         codec: settings.codec.toUpperCase(),
-  //         resolution: settings.resolution,
-  //         bandwidth: settings.bandwidth,
-  //         audio: true,
-  //         video: true,
-  //       });
-  //       await client.publish(localStream);
-  //     } else {
-  //       if (localStream) {
-  //         this._unpublish(localStream);
-  //         localStream = null;
-  //       }
-  //     }
-  //     console.log("local stream", localStream.getTracks())
-  //     this.setState({ localStream });
-  //   } catch (e) {
-  //     console.log("handleLocalStream error => " + e);
-  //     // this._notification("publish/unpublish failed!", e);
-  //   }
-
-  //   //Check audio only conference
-  //   this.muteMediaTrack("video", this.props.localVideoEnabled);
-
-  // };
-
-  handleScreenSharing = async enabled => {
-    // let { localScreen } = this.state;
-    // const { client, settings } = this.props;
-    // if (enabled) {
-    //   localScreen = await LocalStream.getDisplayMedia({
-    //     codec: settings.codec.toUpperCase(),
-    //     resolution: settings.resolution,
-    //     bandwidth: settings.bandwidth,
-    //   });
-    //   await client.publish(localScreen);
-    //   let track = localScreen.getVideoTracks()[0];
-    //   if (track) {
-    //     track.addEventListener("ended", () => {
-    //       this.handleScreenSharing(false);
-    //     });
-    //   }
-    // } else {
-    //   if (localScreen) {
-    //     this._unpublish(localScreen);
-    //     localScreen = null;
-    //   }
-    // }
-    // this.setState({ localScreen });
+  handleScreenSharing = async (enabled) => {
+    let { localScreen } = this.state;
+    const { connector, settings } = this.props;
+    if (enabled) {
+      localScreen = await LocalStream.getDisplayMedia({
+        codec: settings.codec.toUpperCase(),
+        resolution: settings.resolution,
+        bandwidth: settings.bandwidth,
+      });
+      await connector.sfu.publish(localScreen);
+      let track = localScreen.getVideoTracks()[0];
+      if (track) {
+        track.addEventListener("ended", () => {
+          this.handleScreenSharing(false);
+        });
+      }
+    } else {
+      if (localScreen) {
+        this._unpublish(localScreen);
+        localScreen = null;
+      }
+    }
+    this.setState({ localScreen });
   };
 
   _stopMediaStream = async (stream) => {
