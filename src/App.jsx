@@ -72,11 +72,12 @@ class App extends React.Component {
   _handleJoin = async (values) => {
     this.setState({ loading: true });
 
-    let connector = new IonConnector("http://localhost:5551");
+    let url = window.location.protocol + "//" + window.location.hostname + ":5551";
+    console.log("Connect url:" + url);
+    let connector = new IonConnector(url);
     this.connector = connector;
       let uid = uuidv4();
-      console.log("Connect url:http://localhost:5551");
-
+  
       connector.onjoin = (success, reason) => {
         console.log("onjoin: ", success, ", ", reason);
         this._onJoin(values,uid);
