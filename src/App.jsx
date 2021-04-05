@@ -127,6 +127,12 @@ class App extends React.Component {
 
     connector.onmessage = (msg) => {
       console.log("onmessage: from ", msg.from,", to ", msg.to, ", text = ", msg.data.text);
+      let messages = this.state.messages;
+      if(this.state.uid != msg.from){
+        let uid = 1;
+        messages.push(new Message({ id: uid, message: msg.data.text, senderName: msg.data.name }));
+        this.setState({ messages });
+      }
     }
 
     window.onunload = async () => {
@@ -257,24 +263,18 @@ class App extends React.Component {
     reactLocalStorage.setObject("settings", this._settings);
   }
 
-  _onMessageReceived = (data) => {
-    console.log('Received message:' + data.senderName + ":" + data.msg);
-    let messages = this.state.messages;
-    let uid = 1;
-    messages.push(new Message({ id: uid, message: data.msg, senderName: data.senderName }));
-    this.setState({ messages });
-  }
+  _onSendMessage = (msg) => {
+    console.log('Send message:' + msg);
 
-  _onSendMessage = (data) => {
-    console.log('Send message:' + data);
-    var info =  {
-      "senderName":this.state.loginInfo.displayName,
-      "msg": data,
+    var data =  {
+      "uid":this.state.uid,
+      "name":this.state.loginInfo.displayName,
+      "text": msg,
     };
-    this.client.broadcast(info);
+    this.connector.message(this.state.uid,'all',data);
     let messages = this.state.messages;
     let uid = 0;
-    messages.push(new Message({ id: uid, message: data, senderName: 'me' }));
+    messages.push(new Message({ id: uid, message: msg, senderName: 'me' }));
     this.setState({ messages });
   }
 
