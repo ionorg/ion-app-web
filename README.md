@@ -70,4 +70,4 @@ Start dev server
 npm start
 ```
 
-Serves on `https://localhost:8080`
+Serves on `http://localhost:8080`
