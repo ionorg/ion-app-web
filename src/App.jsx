@@ -161,6 +161,8 @@ class App extends React.Component {
       localVideoEnabled: !values.audioOnly,
     });
 
+    this.conference.handleLocalStream(true);
+
     this._notification(
       "Connected!",
       "Welcome to the ion room => " + values.roomId

@@ -16,41 +16,6 @@ class Conference extends React.Component {
     };
   }
 
-  componentDidMount = () => {
-    const { connector } = this.props;
-    this.handleLocalStream(true);
-
-    let streams = this.state.streams;
-    connector.ontrack = (track, stream) => {
-      console.log("got track", track.id, "for stream", stream.id);
-      if (track.kind === "video") {
-        track.onunmute = () => {
-          if (!streams[stream.id]) {
-
-            console.log("stream.id:::" + stream.id);
-            let name = 'Guest';
-            let peers = this.props.peers;
-            peers.forEach((item) => {
-              if(item.id == stream.id){
-                name = item.name;
-              }
-            });
-            
-            stream.info = {'name':name};
-            streams.push({ id:stream.id, stream });
-            this.setState({ streams });
-
-            stream.onremovetrack = () => {
-              let streams = this.state.streams;
-              streams = streams.filter(item => item.id !== stream.id);
-              this.setState({ streams });
-            };
-          }
-        };
-      }
-    };
-  };
-
   cleanUp = async () => {
     let { localStream, localScreen, streams } = this.state;
     await this.setState({ localStream: null, localScreen: null, streams: [] });
@@ -99,6 +64,38 @@ class Conference extends React.Component {
   handleLocalStream = async (enabled) => {
     const {connector,settings} = this.props;
     let { localStream } = this.state;
+
+    let streams = this.state.streams;
+    connector.ontrack = (track, stream) => {
+      console.log("got track", track.id, "for stream", stream.id);
+      if (track.kind === "video") {
+        track.onunmute = () => {
+          if (!streams[stream.id]) {
+
+            console.log("stream.id:::" + stream.id);
+            let name = 'Guest';
+            let peers = this.props.peers;
+            peers.forEach((item) => {
+              if(item.id == stream.id){
+                name = item.name;
+              }
+            });
+            
+            stream.info = {'name':name};
+            streams.push({ id:stream.id, stream });
+            this.setState({ streams });
+
+            stream.onremovetrack = () => {
+              let streams = this.state.streams;
+              streams = streams.filter(item => item.id !== stream.id);
+              this.setState({ streams });
+            };
+          }
+        };
+      }
+    };
+
+
 
     if (enabled) {
       LocalStream.getUserMedia({
