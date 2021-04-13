@@ -312,7 +312,7 @@ class LoginForm extends React.Component {
           </Button>
           </Form.Item>
         </Form>
-        <center>
+        {/* <center>
           {this.state.test ?
           <>
             <ConnectionStep step={steps.biz} />
@@ -321,7 +321,7 @@ class LoginForm extends React.Component {
             <ConnectionStep step={steps.subscribe} />
           </>
           : <Button onClick={() => this._testConnection()}>Test Connection</Button>}
-        </center>
+        </center> */}
       </>
     );
   }
