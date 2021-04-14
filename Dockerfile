@@ -1,8 +1,16 @@
-FROM node:lts-alpine
+FROM node:current-alpine
+
+RUN alias python=python3
+RUN apk add python3
+RUN apk add python2
+RUN apk add make
+RUN apk add gcc
+RUN apk add g++
+RUN apk add git
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+COPY package.json ./
 RUN npm install
 
 COPY public/ public/
@@ -16,6 +24,8 @@ RUN npm run build
 
 FROM caddy:2.1.1-alpine
 ENV ENABLE_TELEMETRY="false"
+#ENV WWW_URL=""
+#ENV ADMIN_EMAIL=""
 
 WORKDIR /app
 COPY configs/certs/ /app/certs/
