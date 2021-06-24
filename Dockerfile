@@ -1,4 +1,4 @@
-FROM node:15-alpine
+FROM node:16-alpine
 
 RUN alias python=python3
 RUN apk add python3
