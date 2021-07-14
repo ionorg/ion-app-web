@@ -125,7 +125,7 @@ class Conference extends React.Component {
 
   handleScreenSharing = async (enabled) => {
     let { localScreen } = this.state;
-    const { connector, settings } = this.props;
+    const { connector, settings,screenSharingClick} = this.props;
     if (enabled) {
       localScreen = await LocalStream.getDisplayMedia({
         codec: settings.codec.toUpperCase(),
@@ -136,6 +136,7 @@ class Conference extends React.Component {
       let track = localScreen.getVideoTracks()[0];
       if (track) {
         track.addEventListener("ended", () => {
+          screenSharingClick(false);
           this.handleScreenSharing(false);
         });
       }
