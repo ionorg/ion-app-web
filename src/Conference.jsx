@@ -70,7 +70,7 @@ class Conference extends React.Component {
       console.log("got track", track.id, "for stream", stream.id);
       if (track.kind === "video") {
         track.onunmute = () => {
-          if (!streams[stream.id]) {
+          if (!this.hasStream(stream)) {
 
             console.log("stream.id:::" + stream.id);
             let name = 'Guest';
@@ -86,16 +86,23 @@ class Conference extends React.Component {
             this.setState({ streams });
 
             stream.onremovetrack = () => {
+              console.log("onremovetrack::" + stream.id);
               let streams = this.state.streams;
               streams = streams.filter(item => item.id !== stream.id);
               this.setState({ streams });
             };
           }
+          this.updateMuteStatus(stream, false);
         };
+
+        track.onmute = () => {
+          console.log("onmute:::" + stream.id);
+          this.updateMuteStatus(stream, true);
+        }
+
       }
+
     };
-
-
 
     if (enabled) {
       LocalStream.getUserMedia({
@@ -122,6 +129,29 @@ class Conference extends React.Component {
 
       this.muteMediaTrack("video", this.props.localVideoEnabled);
   };
+
+  hasStream = (stream) => {
+    let flag = false;
+    let streams = this.state.streams;
+    streams.forEach((item) => {
+        if (item.id == stream.id) {
+            flag = true;
+        }
+    });
+    return flag;
+  }
+
+  updateMuteStatus = (stream, muted) => {
+    let streams = this.state.streams;
+    streams.forEach((item) => {
+        if (item.id == stream.id) {
+            item.muted = muted;
+        }
+    });
+    this.setState({
+        streams: streams,
+    });
+  }
 
   handleScreenSharing = async (enabled) => {
     let { localScreen } = this.state;
@@ -202,7 +232,7 @@ class Conference extends React.Component {
         )}
         {streams.map((item, index) => {
           return index == 0 ? (
-            <MainVideoView key={item.mid} id={item.mid} stream={item.stream} vidFit={vidFit} />
+            <MainVideoView key={item.mid} id={item.mid} stream={item.stream} vidFit={vidFit} muted={item.muted} />
           ) : (
             ""
           );
@@ -238,6 +268,7 @@ class Conference extends React.Component {
                 <SmallVideoView
                   key={item.mid}
                   id={item.mid}
+                  muted={item.muted}
                   stream={item.stream}
                   videoCount={streams.length}
                   collapsed={this.props.collapsed}

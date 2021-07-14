@@ -1,4 +1,5 @@
 import React from "react";
+import { Avatar } from 'antd';
 
 class SmallVideoView extends React.Component {
 
@@ -27,7 +28,7 @@ class SmallVideoView extends React.Component {
   };
 
   render = () => {
-    const { id, stream } = this.props;
+    const { id, stream,muted } = this.props;
 
     return (
       <div onClick={this._handleClick} className="small-video-div">
@@ -41,6 +42,13 @@ class SmallVideoView extends React.Component {
           muted={false}
           className="small-video-size"
         />
+        {
+                    muted?
+                    <div className='small-video-avatar'>
+                        <Avatar size={40} icon="user"/>
+                    </div>
+                    : ""
+                }
         <div className="small-video-id-div">
           <a className="small-video-id-a">{stream.info.name}</a>
         </div>
