@@ -70,8 +70,15 @@ class Conference extends React.Component {
       console.log("got track", track.id, "for stream", stream.id);
       if (track.kind === "video") {
         track.onunmute = () => {
-          if (!streams[stream.id]) {
+          let found = false
+          streams.forEach(item=>{
+                 if(stream.id === item.id){
+                    found = true
+                 }
+              }
+          )
 
+          if (!found) {
             console.log("stream.id:::" + stream.id);
             let name = 'Guest';
             let peers = this.props.peers;
@@ -86,7 +93,6 @@ class Conference extends React.Component {
             this.setState({ streams });
 
             stream.onremovetrack = () => {
-              let streams = this.state.streams;
               streams = streams.filter(item => item.id !== stream.id);
               this.setState({ streams });
             };
