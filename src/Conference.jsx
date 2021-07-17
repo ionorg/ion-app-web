@@ -206,7 +206,7 @@ class Conference extends React.Component {
     let big = 0;
     for (let i = 0; i < streams.length; i++) {
       let item = streams[i];
-      if (item.mid == id) {
+      if (item.id == id) {
         big = i;
         break;
       }
@@ -238,7 +238,7 @@ class Conference extends React.Component {
         )}
         {streams.map((item, index) => {
           return index == 0 ? (
-            <MainVideoView key={item.mid} id={item.mid} stream={item.stream} vidFit={vidFit} muted={item.muted} />
+            <MainVideoView key={item.id} id={item.id} stream={item.stream} vidFit={vidFit} muted={item.muted} />
           ) : (
             ""
           );
@@ -272,8 +272,8 @@ class Conference extends React.Component {
             {streams.map((item, index) => {
               return index > 0 ? (
                 <SmallVideoView
-                  key={item.mid}
-                  id={item.mid}
+                  key={item.id}
+                  id={item.id}
                   muted={item.muted}
                   stream={item.stream}
                   videoCount={streams.length}
