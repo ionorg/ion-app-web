@@ -43,8 +43,8 @@ class App extends React.Component {
     this._settings = {
       selectedAudioDevice: "",
       selectedVideoDevice: "",
-      resolution: "hd",
-      bandwidth: 1024,
+      resolution: "vga",
+      bandwidth: 512,
       codec: "vp8",
       isDevMode:false,
     }
