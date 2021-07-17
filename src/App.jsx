@@ -297,6 +297,12 @@ class App extends React.Component {
     this.setState({ messages });
   }
 
+  _onScreenSharingClick = enabled => {
+    this.setState({
+        screenSharingEnabled: enabled
+    });
+  }
+
   render() {
     const {
       login,
@@ -416,6 +422,7 @@ class App extends React.Component {
                     peers={this.state.peers}
                     localAudioEnabled={localAudioEnabled}
                     localVideoEnabled={localVideoEnabled}
+                    screenSharingClick={this._onScreenSharingClick}
                     vidFit={vidFit}
                     ref={ref => {
                       this.conference = ref;
