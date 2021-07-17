@@ -67,6 +67,7 @@ module.exports = (env) => {
   ],
   devServer: {
     hot: true,
+    disableHostCheck: true,
     proxy: {
       '/ws': {
          target: 'ws://localhost:8443',
