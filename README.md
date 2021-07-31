@@ -24,6 +24,11 @@ docker-compose -f docker-compose.yml up
 
 Chat: [https://localhost:9090](https://localhost:9090)
 
+Run this to rebuild when you modify the code
+```
+docker-compose -f docker-compose.yml up --build
+```
+
 #### Prod hosting and auto SSL
 
 Enable production ports and Caddy file for web service in `docker-compose.prod.yml`.
@@ -45,6 +50,7 @@ ADMIN_EMAIL=yourname@yourdomain
 Bring up docker with
 
 ```
+docker pull pionwebrtc/ion-app-web
 docker network create ionnet
 docker-compose -f docker-compose.prod.yml up
 ```
