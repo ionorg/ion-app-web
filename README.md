@@ -9,18 +9,24 @@ ion web app
 
 ### Docker
 
-Build docker image with production build of web app. Serve on `https://localhost:9090`
+Warning: **make sure ion is deployed by docker too**
+
+#### Local hosting and auto ssl
+
+Build docker image with production build of web app. erve on `https://localhost:9090`
 
 Biz websocket is proxied using caddy server and docker network from ion.
 
 ```
 docker network create ionnet
-docker-compose up --build
+docker-compose -f docker-compose.yml up
 ```
 
-#### Remote Hosting / Auto SSL
+Chat: [https://localhost:9090](https://localhost:9090)
 
-Enable production ports and Caddy file for web service in `docker-compose.yml`.
+#### Prod hosting and auto SSL
+
+Enable production ports and Caddy file for web service in `docker-compose.prod.yml`.
 
 Make sure these ports are exposed publicly
 
@@ -29,24 +35,21 @@ Make sure these ports are exposed publicly
 443/tcp
 ```
 
-Configure your domain.
+Configure your domain/email in docker-compose.prod.yml
 
 ```
-export WWW_URL=yourdomain
-export ADMIN_EMAIL=yourname@yourdomain
+WWW_URL=yourdomain
+ADMIN_EMAIL=yourname@yourdomain
 ```
-
-These variables can also be set in the `docker-compose.yml`.
-
-#### Chat!
 
 Bring up docker with
 
 ```
-docker-compose up --build
+docker network create ionnet
+docker-compose -f docker-compose.prod.yml up
 ```
 
-Open this url with chrome
+Chat: [https://localhost:9090](https://localhost:9090)
 
 ```
 https://yourdomain
@@ -70,4 +73,6 @@ Start dev server
 npm start
 ```
 
-Serves on `http://localhost:8080`
+Chat: [https://localhost:8080](https://localhost:8080)
+
+

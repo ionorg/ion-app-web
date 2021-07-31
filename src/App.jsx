@@ -72,7 +72,7 @@ class App extends React.Component {
   _handleJoin = async (values) => {
     this.setState({ loading: true });
 
-    let url = window.location.protocol + "//" + window.location.hostname + ":5551";
+    let url = window.location.protocol + "//" + window.location.hostname+":"+ window.location.port;
     console.log("Connect url:" + url);
     let connector = new IonConnector(url);
     this.connector = connector;

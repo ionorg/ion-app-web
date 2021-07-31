@@ -1,0 +1,11 @@
+localhost:9090 {
+  root * /app/dist
+  file_server
+
+  tls internal
+
+  reverse_proxy /biz.Biz/Signal signal:5551 {
+  }
+  reverse_proxy /sfu.SFU/Signal signal:5551 {
+  }
+}

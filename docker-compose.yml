@@ -4,15 +4,11 @@ services:
   web:
     build: .
     volumes:
-      # Uncomment for production
-      # - "./configs/caddy/Caddyfile:/etc/caddy/Caddyfile"
-      # Dev caddyfile
-      - "./configs/caddy/local.Caddyfile:/etc/caddy/Caddyfile"
+      # Dev caddy file
+      - "./Caddyfile:/etc/caddy/Caddyfile"
       - "caddy:/data"
     ports:
-      # Prod ports
-      # - 80:80
-      # - 443:443
+      # Dev port
       - 9090:9090
     networks:
       - ionnet

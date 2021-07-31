@@ -24,9 +24,6 @@ RUN npm run build
 
 FROM caddy:2.1.1-alpine
 ENV ENABLE_TELEMETRY="false"
-#ENV WWW_URL=""
-#ENV ADMIN_EMAIL=""
 
 WORKDIR /app
-COPY configs/certs/ /app/certs/
 COPY --from=0 /app/dist /app/dist

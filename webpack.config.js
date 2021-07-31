@@ -69,8 +69,12 @@ module.exports = (env) => {
     hot: true,
     disableHostCheck: true,
     proxy: {
-      '/ws': {
-         target: 'ws://localhost:8443',
+      '/biz.Biz/Signal': {
+         target: 'ws://localhost:5551',
+         ws: true
+      },
+      '/sfu.SFU/Signal': {
+         target: 'ws://localhost:5551',
          ws: true
       },
     },

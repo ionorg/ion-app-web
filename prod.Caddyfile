@@ -1,0 +1,12 @@
+{$WWW_URL} {
+  root * /app/dist
+  file_server
+  tls {$ADMIN_EMAIL}
+
+  # proxy to signal service
+  reverse_proxy /biz.Biz/Signal signal:5551 {
+  }
+
+  reverse_proxy /sfu.SFU/Signal signal:5551 {
+  }
+}

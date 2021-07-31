@@ -1,0 +1,27 @@
+version: '3.7'
+
+services:
+  web:
+    build: .
+    volumes:
+      # prod caddy file
+      - "./prod.Caddyfile:/etc/caddy/Caddyfile"
+      - "caddy:/data"
+    ports:
+       # prod ports
+       - 80:80
+       - 443:443
+    networks:
+      - ionnet
+    environment:
+      # must set, used by caddy to download free certificate
+      - WWW_URL=yourdomain
+      - ADMIN_EMAIL=youremail
+
+volumes:
+  caddy:
+
+networks:
+  ionnet:
+    external: true
+    name: ionnet
