@@ -49,7 +49,7 @@ docker network create ionnet
 docker-compose -f docker-compose.prod.yml up
 ```
 
-Chat: [https://localhost:9090](https://localhost:9090)
+Chat: 
 
 ```
 https://yourdomain
