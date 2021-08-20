@@ -1,34 +1,27 @@
-import React, { Component } from "react";
+import React, { useState,Component } from "react";
 import PropTypes from 'prop-types';
 import { Input,Button } from 'antd';
 
-export default class ChatInput extends Component {
-  constructor(props) {
-    super(props);
+export default function ChatInput(props) {
 
-    this.state = {
-      inputMessage:"",
-    }
+  const [inputMessage,setInputMessage] = useState("");
+
+  const onInputChange = (event) => {
+    setInputMessage(event.target.value);
   }
 
-  onInputChange = (event) => {
-    this.setState({
-      inputMessage:event.target.value,
-    });
+  const onBtnSendHandler = (event) => {
+    sendMessage();
   }
 
-  onBtnSendHandler = (event) => {
-    this.sendMessage();
-  }
-
-  onInputKeyUp = (event) => {
+  const onInputKeyUp = (event) => {
     if (event.keyCode == 13) {
-      this.sendMessage();
+      sendMessage();
     }
   }
 
-  sendMessage = () =>{
-    let msg = this.state.inputMessage;
+  const sendMessage = () =>{
+    let msg = inputMessage;
 
     if (msg.length === 0) {
       return;
@@ -36,24 +29,20 @@ export default class ChatInput extends Component {
     if (msg.replace(/(^\s*)|(\s*$)/g, "").length === 0) {
       return;
     }
-    this.props.onSendMessage(msg);
-    this.setState({
-      inputMessage:"",
-    });
+    props.onSendMessage(msg);
+    setInputMessage("");
   }
-
-  render() {
-    return (
+  
+  return (
         <div className='chat-input'>
           <Input
               placeholder='Please input message'
-              onChange={this.onInputChange}
-              onPressEnter={this.onInputKeyUp}
-              value={this.state.inputMessage}/>
-          <Button style={{marginLeft:'4px',}} icon='message' onClick={this.onBtnSendHandler}/>
+              onChange={onInputChange}
+              onPressEnter={onInputKeyUp}
+              value={inputMessage}/>
+          <Button style={{marginLeft:'4px',}} icon='message' onClick={onBtnSendHandler}/>
         </div>
     );
-  }
 }
 
 ChatInput.propTypes = {
