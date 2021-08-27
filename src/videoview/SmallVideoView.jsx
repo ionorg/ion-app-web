@@ -1,61 +1,45 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { Avatar } from 'antd';
 
-class SmallVideoView extends React.Component {
+export default function SmallVideoView(props) {
 
-  constructor(props) {
-    super(props)
-    this.state = {
-      clientWidth:document.body.offsetWidth,
-      clientHeight:document.body.offsetHeight,
+  const videoRef = useRef(null)
+
+  useEffect(() => {
+    videoRef.current.srcObject = props.stream;
+    return () => {
+      videoRef.current.srcObject = null;
     }
-  }
+  }, [])
 
-  componentDidMount = () => {
-    const { stream } = this.props;
-    this.video.srcObject = stream;
-
-
+  const handleClick = () => {
+    let { id, index } = props;
+    props.onClick({ id, index });
   };
 
-  componentWillUnmount = () => {
-    this.video.srcObject = null;
-  }
+  const { id, stream, muted } = props;
 
-  _handleClick = () => {
-    let { id, index } = this.props;
-    this.props.onClick({ id, index });
-  };
-
-  render = () => {
-    const { id, stream,muted } = this.props;
-
-    return (
-      <div onClick={this._handleClick} className="small-video-div">
-        <video
-          ref={ref => {
-            this.video = ref;
-          }}
-          id={id}
-          autoPlay
-          playsInline
-          muted={false}
-          className="small-video-size"
-        />
-        {
-                    muted?
-                    <div className='small-video-avatar'>
-                        <Avatar size={40} icon="user"/>
-                    </div>
-                    : ""
-                }
-        <div className="small-video-id-div">
-          <a className="small-video-id-a">{stream.info.name}</a>
-        </div>
-
+  return (
+    <div onClick={handleClick} className="small-video-div">
+      <video
+        ref={videoRef}
+        id={id}
+        autoPlay
+        playsInline
+        muted={false}
+        className="small-video-size"
+      />
+      {
+        muted ?
+          <div className='small-video-avatar'>
+            <Avatar size={40} icon="user" />
+          </div>
+          : ""
+      }
+      <div className="small-video-id-div">
+        <a className="small-video-id-a">{stream.info.name}</a>
       </div>
-    );
-  };
-}
 
-export default SmallVideoView;
+    </div>
+  );
+}
