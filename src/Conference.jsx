@@ -1,33 +1,33 @@
-import React from "react";
+import React, { useState, useImperativeHandle } from "react";
 import { Spin, notification } from "antd";
 import { LocalVideoView, MainVideoView, SmallVideoView } from "./videoview";
 import "../styles/css/conference.scss";
 import { LocalStream } from "ion-sdk-js/lib/ion";
 
-class Conference extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      streams: [],
-      localStream: null,
-      localScreen: null,
-      audioMuted: false,
-      videoMuted: false
-    };
-  }
+function Conference(props, ref) {
 
-  cleanUp = async () => {
-    let { localStream, localScreen, streams } = this.state;
-    await this.setState({ localStream: null, localScreen: null, streams: [] });
+  const [streams, setStreams] = useState([])
+  const [localStreamObj, setLocalStream] = useState({stream:null})
+  const [localScreenObj, setLocalScreen] = useState({stream:null})
+  const [audioMuted, setAudioMuted] = useState(false)
+  const [videoMuted, setVideoMuted] = useState(false)
+
+  const doCleanUp = async () => {
+
+    localStreamObj.stream = null
+    setLocalStream(localStreamObj)
+    localScreenObj.stream = null
+    setLocalScreen(localScreenObj)
+    setStreams([])
 
     streams.map(async item => {
       await item.stream.unsubscribe();
     });
 
-    await this._unpublish(localStream)
+    await unpublish(localStreamObj.stream)
   };
 
-  _notification = (message, description) => {
+  const notificationTip = (message, description) => {
     notification.info({
       message: message,
       description: description,
@@ -35,75 +35,90 @@ class Conference extends React.Component {
     });
   };
 
-  _unpublish = async stream => {
+  const unpublish = async stream => {
     if (stream) {
-      await this._stopMediaStream(stream);
+      await stopMediaStream(stream);
       await stream.unpublish();
     }
   };
 
-  muteMediaTrack = (type, enabled) => {
-    let { localStream } = this.state;
-    if(!localStream) {
+  const doMuteMediaTrack = (type, enabled) => {
+    if (!localStreamObj.stream) {
       return
     }
-    if(enabled) {
-      localStream.unmute(type)
+    if (enabled) {
+      localStreamObj.stream.unmute(type)
     } else {
-      localStream.mute(type)
+      localStreamObj.stream.mute(type)
     }
 
     if (type === "audio") {
-      this.setState({ audioMuted: !enabled });
+      setAudioMuted(!enabled)
     } else if (type === "video") {
-      this.setState({ videoMuted: !enabled });
+      setVideoMuted(!enabled)
     }
   };
 
+  useImperativeHandle(
+    ref,
+    () => ({
+      handleLocalStream(enabled) {
+        doHandleLocalStream(enabled)
+      },
+      handleScreenSharing(enabled) {
+        doHandleScreenSharing(enabled)
+      },
+      muteMediaTrack(type, enabled) {
+        doMuteMediaTrack(type, enabled)
+      },
+      cleanUp(){
+        doCleanUp();
+      }
+    }),
+    []
+  );
 
-  handleLocalStream = async (enabled) => {
-    const {connector,settings} = this.props;
-    let { localStream } = this.state;
-
-    let streams = this.state.streams;
+  const doHandleLocalStream = async (enabled) => {
+    const { connector, settings } = props;
+    
+    let _streams = streams;
     connector.ontrack = (track, stream) => {
       console.log("got track", track.id, "for stream", stream.id);
       if (track.kind === "video") {
         track.onunmute = () => {
 
           let found = false
-          streams.forEach(item=>{
-                 if(stream.id === item.id){
-                    found = true
-                 }
-              }
-          )
-          
+          _streams.forEach(item => {
+            if (stream.id === item.id) {
+              found = true
+            }
+          })
+
           if (!found) {
             console.log("stream.id:::" + stream.id);
             let name = 'Guest';
-            let peers = this.props.peers;
+            let peers = props.peers;
             peers.forEach((item) => {
-              if(item.id == stream.id){
+              if (item.id == stream.id) {
                 name = item.name;
               }
             });
-            
-            stream.info = {'name':name};
-            streams.push({ id:stream.id, stream });
-            this.setState({ streams });
+
+            stream.info = { 'name': name };
+            _streams.push({ id: stream.id, stream });
+            setStreams([..._streams])
 
             stream.onremovetrack = () => {
-              streams = streams.filter(item => item.id !== stream.id);
-              this.setState({ streams });
+              _streams = _streams.filter(item => item.id !== stream.id);
+              setStreams([..._streams])
             };
           }
-          this.updateMuteStatus(stream, false);
+          updateMuteStatus(stream, false);
         };
 
         track.onmute = () => {
           console.log("onmute:::" + stream.id);
-          this.updateMuteStatus(stream, true);
+          updateMuteStatus(stream, true);
         }
 
       }
@@ -119,80 +134,78 @@ class Conference extends React.Component {
         video: true,
       })
         .then((media) => {
-          localStream = media;
+          localStreamObj.stream = media
+          setLocalStream(localStreamObj)
           connector.sfu.publish(media);
-          this.setState({ localStream });
         })
-        .catch ((e) => {
-            console.log("handleLocalStream error => " + e);
+        .catch((e) => {
+          console.log("handleLocalStream error => " + e);
         });
-    }else{
-      if (localStream) {
-        this._unpublish(localStream);
-        localStream = null;
+    } else {
+      if (localStreamObj.stream) {
+        unpublish(localStreamObj.stream);
+        localStreamObj.stream = null;
+        setLocalStream(localStreamObj)
       }
     }
 
-      this.muteMediaTrack("video", this.props.localVideoEnabled);
-  };
+    doMuteMediaTrack("video", props.localVideoEnabled);
+  }
 
-  hasStream = (stream) => {
+
+  const hasStream = (stream) => {
     let flag = false;
-    let streams = this.state.streams;
     streams.forEach((item) => {
-        if (item.id == stream.id) {
-            flag = true;
-        }
+      if (item.id == stream.id) {
+        flag = true;
+      }
     });
     return flag;
   }
 
-  updateMuteStatus = (stream, muted) => {
-    let streams = this.state.streams;
+  const updateMuteStatus = (stream, muted) => {
     streams.forEach((item) => {
-        if (item.id == stream.id) {
-            item.muted = muted;
-        }
+      if (item.id == stream.id) {
+        item.muted = muted;
+      }
     });
-    this.setState({
-        streams: streams,
-    });
+    setStreams(streams)
   }
 
-  handleScreenSharing = async (enabled) => {
-    let { localScreen } = this.state;
-    const { connector, settings,screenSharingClick} = this.props;
+  const doHandleScreenSharing = async (enabled) => {
+    const { connector, settings, screenSharingClick } = props;
     if (enabled) {
-      localScreen = await LocalStream.getDisplayMedia({
+      localScreenObj.stream = await LocalStream.getDisplayMedia({
         codec: settings.codec.toUpperCase(),
         resolution: settings.resolution,
         bandwidth: settings.bandwidth,
       });
-      await connector.sfu.publish(localScreen);
-      let track = localScreen.getVideoTracks()[0];
+      setLocalScreen(localScreenObj)
+      await connector.sfu.publish(localScreenObj.stream);
+      let track = localScreenObj.stream.getVideoTracks()[0];
       if (track) {
         track.addEventListener("ended", () => {
           screenSharingClick(false);
-          this.handleScreenSharing(false);
+          doHandleScreenSharing(false);
         });
       }
     } else {
-      if (localScreen) {
-        this._unpublish(localScreen);
-        localScreen = null;
+      if (localScreenObj.stream) {
+        unpublish(localScreenObj.stream);
+        localScreenObj.stream = null
+        setLocalScreen(localScreenObj)
       }
     }
-    this.setState({ localScreen });
   };
 
-  _stopMediaStream = async (stream) => {
+  const stopMediaStream = async (stream) => {
     let tracks = stream.getTracks();
     for (let i = 0, len = tracks.length; i < len; i++) {
       await tracks[i].stop();
     }
   };
 
-  _onChangeVideoPosition = data => {
+  const onChangeVideoPosition = data => {
     let id = data.id;
     let index = data.index;
     console.log("_onChangeVideoPosition id:" + id + "  index:" + index);
@@ -201,95 +214,89 @@ class Conference extends React.Component {
       return;
     }
 
-    const streams = this.state.streams;
+    let _streams = streams;
     let first = 0;
     let big = 0;
-    for (let i = 0; i < streams.length; i++) {
-      let item = streams[i];
+    for (let i = 0; i < _streams.length; i++) {
+      let item = _streams[i];
       if (item.id == id) {
         big = i;
         break;
       }
     }
 
-    let c = streams[first];
-    streams[first] = streams[big];
-    streams[big] = c;
+    let c = _streams[first];
+    _streams[first] = _streams[big];
+    _streams[big] = c;
 
-    this.setState({ streams: streams });
+    setStreams([..._streams])
   };
 
-  render = () => {
-    const { vidFit } = this.props;
-    const {
-      streams,
-      localStream,
-      localScreen,
-      audioMuted,
-      videoMuted
-    } = this.state;
-    const id = this.props.uid;
-    return (
-      <div className="conference-layout">
-        {streams.length === 0 && (
-          <div className="conference-layout-wating">
-            <Spin size="large" tip="Wait for other people joining ..." />
-          </div>
-        )}
-        {streams.map((item, index) => {
-          return index == 0 ? (
-            <MainVideoView key={item.id} id={item.id} stream={item.stream} vidFit={vidFit} muted={item.muted} />
-          ) : (
-            ""
-          );
-        })}
-        {localStream && (
-          <div className="conference-local-video-layout">
-              <LocalVideoView
-                id={id + "-video"}
-                label="Local Stream"
-                stream={localStream}
-                audioMuted={audioMuted}
-                videoMuted={videoMuted}
-                videoType="localVideo"
+  const { vidFit } = props;
+  const id = props.uid;
+
+  return (
+    <div className="conference-layout">
+      {streams.length === 0 && (
+        <div className="conference-layout-wating">
+          <Spin size="large" tip="Wait for other people joining ..." />
+        </div>
+      )}
+      {streams.map((item, index) => {
+        return index == 0 ? (
+          <MainVideoView key={item.id} id={item.id} stream={item.stream} vidFit={vidFit} muted={item.muted} />
+        ) : (
+          ""
+        );
+      })}
+      {localStreamObj.stream && (
+        <div className="conference-local-video-layout">
+          <LocalVideoView
+            key={id + "-video"}
+            id={id + "-video"}
+            label="Local Stream"
+            stream={localStreamObj.stream}
+            audioMuted={audioMuted}
+            videoMuted={videoMuted}
+            videoType="localVideo"
+          />
+        </div>
+      )}
+      {localScreenObj.stream && (
+        <div className="conference-local-screen-layout">
+          <LocalVideoView
+            key={id + "-screen"}
+            id={id + "-screen"}
+            label="Screen Sharing"
+            stream={localScreenObj.stream}
+            audioMuted={false}
+            videoMuted={false}
+            videoType="localScreen"
+          />
+        </div>
+      )}
+      <div className="small-video-list-div">
+        <div className="small-video-list">
+          {streams.map((item, index) => {
+            return index > 0 ? (
+              <SmallVideoView
+                key={item.id}
+                id={item.id}
+                muted={item.muted}
+                stream={item.stream}
+                videoCount={streams.length}
+                collapsed={props.collapsed}
+                index={index}
+                onClick={onChangeVideoPosition}
               />
-            </div>
-        )}
-        {localScreen && (
-          <div className="conference-local-screen-layout">
-              <LocalVideoView
-                id={id + "-screen"}
-                label="Screen Sharing"
-                stream={localScreen}
-                audioMuted={false}
-                videoMuted={false}
-                videoType="localScreen"
-              />
-          </div>
-        )}
-        <div className="small-video-list-div">
-          <div className="small-video-list">
-            {streams.map((item, index) => {
-              return index > 0 ? (
-                <SmallVideoView
-                  key={item.id}
-                  id={item.id}
-                  muted={item.muted}
-                  stream={item.stream}
-                  videoCount={streams.length}
-                  collapsed={this.props.collapsed}
-                  index={index}
-                  onClick={this._onChangeVideoPosition}
-                />
-              ) : (
-                <div />
-              );
-            })}
-          </div>
+            ) : (
+              <div />
+            );
+          })}
         </div>
       </div>
-    );
-  };
-}
+    </div>
+  );
+};
 
 export default Conference;
