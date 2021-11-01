@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState,forwardRef } from "react";
 import { Layout, Button, Modal, Icon, notification, Card, Spin, Tooltip } from "antd";
 const { confirm } = Modal;
 const { Header, Content, Footer, Sider } = Layout;
@@ -22,46 +22,51 @@ import Conference from "./Conference";
 import { IonConnector, PeerState } from "ion-sdk-js/lib/ion";
 import { v4 as uuidv4 } from 'uuid';
 
-class App extends React.Component {
-  constructor() {
-    super();
-    this.state = {
-      login: false,
-      loading: false,
-      localAudioEnabled: true,
-      localVideoEnabled: true,
-      screenSharingEnabled: false,
-      collapsed: true,
-      isFullScreen: false,
-      vidFit: false,
-      loginInfo: {},
-      messages: [],
-      uid:'',
-      peers:[],
-    };
+const ForwardRefConference = forwardRef(Conference);
 
-    this._settings = {
-      selectedAudioDevice: "",
-      selectedVideoDevice: "",
-      resolution: "vga",
-      bandwidth: 512,
-      codec: "vp8",
-      isDevMode:false,
-    }
 
-    let settings = reactLocalStorage.getObject("settings");
-    if ( settings.codec !== undefined ){
-        this._settings = settings;
-    }
+function App(props) {
 
+  const conference = useRef(null)
+
+  const [login, setLogin] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [localAudioEnabled, setLocalAudioEnabled] = useState(true)
+  const [localVideoEnabled, setLocalVideoEnabled] = useState(true)
+  const [screenSharingEnabled, setScreenSharingEnabled] = useState(false)
+  const [collapsed, setCollapsed] = useState(true)
+  const [isFullScreen, setIsFullScreen] = useState(false)
+  const [vidFit, setVidFit] = useState(false)
+  const [loginInfo, setLoginInfo] = useState({})
+  const [messages, setMessages] = useState([])
+  const [uid, setUid] = useState(uuidv4())
+  const [peers, setPeers] = useState([])
+  const [connector,setConnector] = useState(null)
+
+  let settings = {
+    selectedAudioDevice: "",
+    selectedVideoDevice: "",
+    resolution: "vga",
+    bandwidth: 512,
+    codec: "vp8",
+    isDevMode: false,
   }
 
-  _cleanUp = async () => {
-    await this.conference.cleanUp();
-    //await this.client.leave();
+  useEffect(() => {
+    let _settings = reactLocalStorage.getObject("settings");
+    if (_settings.codec !== undefined) {
+      settings = _settings;
+    }
+    return () => {
+      cleanUp();
+    }
+  }, [])
+
+  const cleanUp = async () => {
+    await conference.current.cleanUp();
   };
 
-  _notification = (message, description) => {
+  const notificationTip = (message, description) => {
     notification.info({
       message: message,
       description: description,
@@ -69,21 +74,20 @@ class App extends React.Component {
     });
   };
 
-  _handleJoin = async (values) => {
-    this.setState({ loading: true });
+  const handleJoin = async (values) => {
+    setLoading(true)
 
-    let url = window.location.protocol + "//" + window.location.hostname+":"+ window.location.port;
+    let url = window.location.protocol + "//" + window.location.hostname + ":" + window.location.port;
     console.log("Connect url:" + url);
     let connector = new IonConnector(url);
-    this.connector = connector;
-      let uid = uuidv4();
-  
-      connector.onjoin = (success, reason) => {
-        console.log("onjoin: ", success, ", ", reason);
-        this._onJoin(values,uid);
-      };
-      connector.join(values.roomId, uid, {name: values.displayName});
-      
+    setConnector(connector)
+
+    connector.onjoin = (success, reason) => {
+      console.log("onjoin: ", success, ", ", reason);
+      onJoin(values, uid);
+    };
+    connector.join(values.roomId, uid, { name: values.displayName });
+
     connector.onleave = (reason) => {
       console.log("onleave: ", reason);
     };
@@ -125,62 +129,63 @@ class App extends React.Component {
     };
 
     connector.onstreamevent = (ev) => {
-       console.log("onstreamevent: state = ", ev.state, ", sid = ", ev.sid,", uid = ", ev.uid);
-       let peers = this.state.peers;
-       peers.forEach((item) => {
-         if(item.uid == ev.uid){
+      console.log("onstreamevent: state = ", ev.state, ", sid = ", ev.sid, ", uid = ", ev.uid);
+      let _peers = peers;
+      _peers.forEach((item) => {
+        if (item.uid == ev.uid) {
           item['id'] = ev.streams[0].id;
           console.log('ev.streams[0].id:::' + ev.streams[0].id);
-         }
-       });
-       this.setState({
-        peers:peers,
+        }
       });
+      setPeers([..._peers])
     };
 
     connector.onmessage = (msg) => {
-      console.log("onmessage: from ", msg.from,", to ", msg.to, ", text = ", msg.data.text);
-      let messages = this.state.messages;
-      if(this.state.uid != msg.from){
-        let uid = 1;
-        messages.push(new Message({ id: uid, message: msg.data.text, senderName: msg.data.name }));
-        this.setState({ messages });
+      console.log("onmessage: from ", msg.from, ", to ", msg.to, ", text = ", msg.data.text);
+      let _messages = messages;
+      if (uid != msg.from) {
+        let _uid = 1;
+        _messages.push(new Message({ id: _uid, message: msg.data.text, senderName: msg.data.name }));
+        setMessages([..._messages])
+      }
+      else if (uid == msg.from) {
+        let _uid = 0;
+        _messages.push(new Message({ id: _uid, message: msg.data.text, senderName: "me" }));
+        setMessages([..._messages])
       }
     }
 
     window.onunload = async () => {
-      await this._cleanUp();
+      await cleanUp();
     };
   };
 
-  _onJoin = async (values,uid) => {
+  const onJoin = async (values, uid) => {
     reactLocalStorage.remove("loginInfo");
     reactLocalStorage.setObject("loginInfo", values);
-    this.setState({
-      login: true,
-      loading: false,
-      uid:uid,
-      loginInfo: values,
-      localVideoEnabled: !values.audioOnly,
-    });
+   
+    setLogin(true)
+    setLoading(false)
+    setUid(uid)
+    setLoginInfo(values)
+    setLocalVideoEnabled(!values.audioOnly)
 
-    this.conference.handleLocalStream(true);
+    conference.current.handleLocalStream(true);
 
-    this._notification(
+    notificationTip(
       "Connected!",
       "Welcome to the ion room => " + values.roomId
     );
   }
 
-  _handleLeave = async () => {
-    let this2 = this;
+  const handleLeave = async () => {
     confirm({
       title: "Leave Now?",
       content: "Do you want to leave the room?",
       async onOk() {
         console.log("OK");
-        await this2._cleanUp();
-        this2.setState({ login: false });
+        await cleanUp();
+        setLogin(false)
       },
       onCancel() {
         console.log("Cancel");
@@ -188,47 +193,33 @@ class App extends React.Component {
     });
   };
 
-  _handleAudioTrackEnabled = enabled => {
-    this.setState({
-      localAudioEnabled: enabled
-    });
-    this.conference.muteMediaTrack("audio", enabled);
+  const handleAudioTrackEnabled = enabled => {
+    setLocalAudioEnabled(enabled)
+    conference.current.muteMediaTrack("audio", enabled);
   };
 
-  _handleVideoTrackEnabled = enabled => {
-    this.setState({
-      localVideoEnabled: enabled
-    });
-    this.conference.muteMediaTrack("video", enabled);
+  const handleVideoTrackEnabled = enabled => {
+    setLocalVideoEnabled(enabled)
+    conference.current.muteMediaTrack("video", enabled);
   };
 
-  _handleScreenSharing = enabled => {
-    this.setState({
-      screenSharingEnabled: enabled
-    });
-    this.conference.handleScreenSharing(enabled);
+  const handleScreenSharing = enabled => {
+    setScreenSharingEnabled(enabled)
+    conference.current.handleScreenSharing(enabled);
   };
 
-  _onRef = ref => {
-    this.conference = ref;
+  const openOrCloseLeftContainer = collapsed => {
+    setCollapsed(collapsed)
   };
 
-  _openOrCloseLeftContainer = collapsed => {
-    this.setState({
-      collapsed: collapsed
-    });
+  const onVidFitClickHandler = () => {
+    setVidFit(!vidFit)
   };
 
-  _onVidFitClickHandler = () => {
-    this.setState({
-      vidFit: !this.state.vidFit
-    });
-  };
-
-  _onFullScreenClickHandler = () => {
+  const onFullScreenClickHandler = () => {
     let docElm = document.documentElement;
 
-    if (this._fullscreenState()) {
+    if (fullscreenState()) {
 
       if (document.exitFullscreen) {
         document.exitFullscreen();
@@ -243,7 +234,7 @@ class App extends React.Component {
         document.msExitFullscreen();
       }
 
-      this.setState({ isFullScreen: false });
+      setIsFullScreen(false)
 
     } else {
       if (docElm.requestFullscreen) {
@@ -253,7 +244,7 @@ class App extends React.Component {
       else if (docElm.mozRequestFullScreen) {
         docElm.mozRequestFullScreen();
       }
-      //Chrome等
+      //Chrome
       else if (docElm.webkitRequestFullScreen) {
         docElm.webkitRequestFullScreen();
       }
@@ -261,233 +252,217 @@ class App extends React.Component {
       else if (elem.msRequestFullscreen) {
         elem.msRequestFullscreen();
       }
-
-      this.setState({ isFullScreen: true });
+      setIsFullScreen(true)
     }
   }
 
-  _fullscreenState = () => {
+  const fullscreenState = () => {
     return document.fullscreen ||
       document.webkitIsFullScreen ||
       document.mozFullScreen ||
       false;
   }
 
-  _onMediaSettingsChanged = (selectedAudioDevice, selectedVideoDevice, resolution, bandwidth, codec,isDevMode) => {
-    this._settings = { selectedAudioDevice, selectedVideoDevice, resolution, bandwidth, codec,isDevMode }
+  const onMediaSettingsChanged = (selectedAudioDevice, selectedVideoDevice, resolution, bandwidth, codec, isDevMode) => {
+    settings = { selectedAudioDevice, selectedVideoDevice, resolution, bandwidth, codec, isDevMode }
     reactLocalStorage.setObject("settings", this._settings);
   }
 
-  _onSendMessage = (msg) => {
+  const onSendMessage = (msg) => {
     console.log('Send message:' + msg);
 
-    var data =  {
-      "uid":this.state.uid,
-      "name":this.state.loginInfo.displayName,
+    var data = {
+      "uid": uid,
+      "name": loginInfo.displayName,
       "text": msg,
     };
-    this.connector.message(this.state.uid,'all',data);
-    let messages = this.state.messages;
-    let uid = 0;
-    messages.push(new Message({ id: uid, message: msg, senderName: 'me' }));
-    this.setState({ messages });
+    connector.message(uid, 'all', data);
+    let _messages = messages;
+    let _uid = 0;
+    _messages.push(new Message({ id: _uid, message: msg, senderName: 'me' }));
+    setMessages([..._messages])
   }
 
-  _onSystemMessage = (msg) => {
-    let messages = this.state.messages;
-    let uid = 2;
-    messages.push(new Message({ id: uid, message: msg, senderName: 'System' }));
-    this.setState({ messages });
+  const onSystemMessage = (msg) => {
+    let _messages = messages;
+    let _uid = 2;
+    _messages.push(new Message({ id: _uid, message: msg, senderName: 'System' }));
+    setMessages([..._messages])
   }
 
-  _onScreenSharingClick = enabled => {
-    this.setState({
-        screenSharingEnabled: enabled
-    });
+  const onScreenSharingClick = enabled => {
+    setScreenSharingEnabled(enabled)
   }
 
-  render() {
-    const {
-      login,
-      loading,
-      localAudioEnabled,
-      localVideoEnabled,
-      screenSharingEnabled,
-      collapsed,
-      vidFit
-    } = this.state;
-    return (
-      <Layout className="app-layout">
-        <Header className="app-header">
-          <div className="app-header-left">
-            <a href="https://pion.ly" target="_blank">
-              <img src={pionLogo} className="app-logo-img" />
-            </a>
-          </div>
-          {login ? (
-            <div className="app-header-tool">
-              <Tooltip title='Mute/Cancel'>
-                <Button
-                  ghost
-                  size="large"
-                  style={{ color: localAudioEnabled ? "" : "red" }}
-                  type="link"
-                  onClick={() =>
-                    this._handleAudioTrackEnabled(!localAudioEnabled)
+  return (
+    <Layout className="app-layout">
+      <Header className="app-header">
+        <div className="app-header-left">
+          <a href="https://pion.ly" target="_blank">
+            <img src={pionLogo} className="app-logo-img" />
+          </a>
+        </div>
+        {login ? (
+          <div className="app-header-tool">
+            <Tooltip title='Mute/Cancel'>
+              <Button
+                ghost
+                size="large"
+                style={{ color: localAudioEnabled ? "" : "red" }}
+                type="link"
+                onClick={() =>
+                  handleAudioTrackEnabled(!localAudioEnabled)
+                }
+              >
+                <Icon
+                  component={
+                    localAudioEnabled ? MicrophoneIcon : MicrophoneOffIcon
                   }
-                >
-                  <Icon
-                    component={
-                      localAudioEnabled ? MicrophoneIcon : MicrophoneOffIcon
-                    }
-                    style={{ display: "flex", justifyContent: "center" }}
-                  />
-                </Button>
-              </Tooltip>
-              <Tooltip title='Open/Close video'>
-                <Button
-                  ghost
-                  size="large"
-                  style={{ color: localVideoEnabled ? "" : "red" }}
-                  type="link"
-                  onClick={() =>
-                    this._handleVideoTrackEnabled(!localVideoEnabled)
+                  style={{ display: "flex", justifyContent: "center" }}
+                />
+              </Button>
+            </Tooltip>
+            <Tooltip title='Open/Close video'>
+              <Button
+                ghost
+                size="large"
+                style={{ color: localVideoEnabled ? "" : "red" }}
+                type="link"
+                onClick={() =>
+                  handleVideoTrackEnabled(!localVideoEnabled)
+                }
+              >
+                <Icon
+                  component={localVideoEnabled ? VideoIcon : VideocamOffIcon}
+                  style={{ display: "flex", justifyContent: "center" }}
+                />
+              </Button>
+            </Tooltip>
+            <Tooltip title='Hangup'>
+              <Button
+                shape="circle"
+                ghost
+                size="large"
+                type="danger"
+                style={{ marginLeft: 16, marginRight: 16 }}
+                onClick={handleLeave}
+              >
+                <Icon
+                  component={HangupIcon}
+                  style={{ display: "flex", justifyContent: "center" }}
+                />
+              </Button>
+            </Tooltip>
+            <Tooltip title='Share desktop'>
+              <Button
+                ghost
+                size="large"
+                type="link"
+                style={{ color: screenSharingEnabled ? "red" : "" }}
+                onClick={() => handleScreenSharing(!screenSharingEnabled)}
+              >
+                <Icon
+                  component={
+                    screenSharingEnabled ? TelevisionOffIcon : TelevisionIcon
                   }
-                >
-                  <Icon
-                    component={localVideoEnabled ? VideoIcon : VideocamOffIcon}
-                    style={{ display: "flex", justifyContent: "center" }}
-                  />
-                </Button>
-              </Tooltip>
-              <Tooltip title='Hangup'>
-                <Button
-                  shape="circle"
-                  ghost
-                  size="large"
-                  type="danger"
-                  style={{ marginLeft: 16, marginRight: 16 }}
-                  onClick={this._handleLeave}
-                >
-                  <Icon
-                    component={HangupIcon}
-                    style={{ display: "flex", justifyContent: "center" }}
-                  />
-                </Button>
-              </Tooltip>
-              <Tooltip title='Share desktop'>
-                <Button
-                  ghost
-                  size="large"
-                  type="link"
-                  style={{ color: screenSharingEnabled ? "red" : "" }}
-                  onClick={() => this._handleScreenSharing(!screenSharingEnabled)}
-                >
-                  <Icon
-                    component={
-                      screenSharingEnabled ? TelevisionOffIcon : TelevisionIcon
-                    }
-                    style={{ display: "flex", justifyContent: "center" }}
-                  />
-                </Button>
-              </Tooltip>
-              <ToolShare loginInfo={this.state.loginInfo} />
-            </div>
-          ) : (
-              <div />
-            )}
-          <div className="app-header-right">
-            <MediaSettings onMediaSettingsChanged={this._onMediaSettingsChanged} settings={this._settings} />
+                  style={{ display: "flex", justifyContent: "center" }}
+                />
+              </Button>
+            </Tooltip>
+            <ToolShare loginInfo={loginInfo} />
           </div>
-        </Header>
+        ) : (
+          <div />
+        )}
+        <div className="app-header-right">
+          <MediaSettings onMediaSettingsChanged={onMediaSettingsChanged} settings={settings} />
+        </div>
+      </Header>
 
-        <Content className="app-center-layout">
-          {login ? (
-            <Layout className="app-content-layout">
-              <Sider
-                width={320}
-                style={{ background: "#333" }}
-                collapsedWidth={0}
-                trigger={null}
-                collapsible
-                collapsed={this.state.collapsed}>
-                <div className="left-container">
-                  <ChatFeed messages={this.state.messages} onSendMessage={this._onSendMessage}/>
-                </div>
-              </Sider>
-              <Layout className="app-right-layout">
-                <Content style={{ flex: 1 }}>
-                  <Conference
-                    uid={this.state.uid}
-                    collapsed={this.state.collapsed}
-                    connector={this.connector}
-                    settings={this._settings}
-                    peers={this.state.peers}
-                    localAudioEnabled={localAudioEnabled}
-                    localVideoEnabled={localVideoEnabled}
-                    screenSharingClick={this._onScreenSharingClick}
-                    vidFit={vidFit}
-                    ref={ref => {
-                      this.conference = ref;
-                    }}
-                  />
-                </Content>
-                <div className="app-collapsed-button">
-                  <Tooltip title='Open/Close chat panel'>
-                    <Button
-                      icon={this.state.collapsed ? "right" : "left"}
-                      size="large"
-                      shape="circle"
-                      ghost
-                      onClick={() => this._openOrCloseLeftContainer(!collapsed)}
-                    />
-                  </Tooltip>
-                </div>
-                <div className="app-fullscreen-layout">
-                <Tooltip title='Fit/Stretch Video'>
+      <Content className="app-center-layout">
+        {login ? (
+          <Layout className="app-content-layout">
+            <Sider
+              width={320}
+              style={{ background: "#333" }}
+              collapsedWidth={0}
+              trigger={null}
+              collapsible
+              collapsed={collapsed}>
+              <div className="left-container">
+                <ChatFeed messages={messages} onSendMessage={onSendMessage} />
+              </div>
+            </Sider>
+            <Layout className="app-right-layout">
+              <Content style={{ flex: 1 }}>
+                <ForwardRefConference
+                  uid={uid}
+                  collapsed={collapsed}
+                  connector={connector}
+                  settings={settings}
+                  peers={peers}
+                  localAudioEnabled={localAudioEnabled}
+                  localVideoEnabled={localVideoEnabled}
+                  screenSharingClick={onScreenSharingClick}
+                  vidFit={vidFit}
+                  ref={conference}
+                />
+              </Content>
+              <div className="app-collapsed-button">
+                <Tooltip title='Open/Close chat panel'>
                   <Button
-                    icon={this.state.vidFit ? "minus-square" : "plus-square"}
+                    icon={collapsed ? "right" : "left"}
                     size="large"
                     shape="circle"
                     ghost
-                    onClick={() => this._onVidFitClickHandler()}
+                    onClick={() => openOrCloseLeftContainer(!collapsed)}
                   />
                 </Tooltip>
-                  <Tooltip title='Fullscreen/Exit'>
-                    <Button
-                      icon={this.state.isFullScreen ? "fullscreen-exit" : "fullscreen"}
-                      size="large"
-                      shape="circle"
-                      className="app-fullscreen-button"
-                      ghost
-                      onClick={() => this._onFullScreenClickHandler()}
-                    />
-                  </Tooltip>
-                </div>
+              </div>
+              <div className="app-fullscreen-layout">
+                <Tooltip title='Fit/Stretch Video'>
+                  <Button
+                    icon={vidFit ? "minus-square" : "plus-square"}
+                    size="large"
+                    shape="circle"
+                    ghost
+                    onClick={() => onVidFitClickHandler()}
+                  />
+                </Tooltip>
+                <Tooltip title='Fullscreen/Exit'>
+                  <Button
+                    icon={isFullScreen ? "fullscreen-exit" : "fullscreen"}
+                    size="large"
+                    shape="circle"
+                    className="app-fullscreen-button"
+                    ghost
+                    onClick={() => onFullScreenClickHandler()}
+                  />
+                </Tooltip>
+              </div>
 
-              </Layout>
             </Layout>
-          ) : loading ? (
-            <Spin size="large" tip="Connecting..." />
-          ) : (
-                <Card title="Join to Ion" className="app-login-card">
-                  <LoginForm handleLogin={this._handleJoin} createClient={this._createClient} />
-                </Card>
-              )}
-        </Content>
-
-        {!login && (
-          <Footer className=".app-footer">
-            Powered by{" "}
-            <a href="https://pion.ly" target="_blank">
-              Pion
-            </a>{" "}
-            WebRTC.
-          </Footer>
+          </Layout>
+        ) : loading ? (
+          <Spin size="large" tip="Connecting..." />
+        ) : (
+          <Card title="Join to Ion" className="app-login-card">
+            <LoginForm handleLogin={handleJoin}/>
+          </Card>
         )}
-      </Layout>
-    );
-  }
+      </Content>
+
+      {!login && (
+        <Footer className=".app-footer">
+          Powered by{" "}
+          <a href="https://pion.ly" target="_blank">
+            Pion
+          </a>{" "}
+          WebRTC.
+        </Footer>
+      )}
+    </Layout>
+  );
 }
 
 export default App;
