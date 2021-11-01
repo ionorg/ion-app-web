@@ -143,6 +143,11 @@ function App(props) {
         _messages.push(new Message({ id: _uid, message: msg.data.text, senderName: msg.data.name }));
         setMessages([..._messages])
       }
+      else if (uid == msg.from) {
+        let _uid = 0;
+        _messages.push(new Message({ id: _uid, message: msg.data.text, senderName: "me" }));
+        setMessages([..._messages])
+      }
     }
 
     window.onunload = async () => {
