@@ -93,34 +93,39 @@ function App(props) {
     };
 
     connector.onpeerevent = (ev) => {
-      console.log("onpeerevent: state = ", ev.state, ", peer = ", ev.peer.uid, ", name = ", ev.peer.info.name);
+       console.log("onpeerevent: state = ", ev.state, ", peer = ", ev.peer.uid, ", name = ", ev.peer.info.name);
+       
+       let peers = this.state.peers || [];
+       if(ev.state == PeerState.JOIN){
+        this._notification("Peer Join", "peer => " + ev.peer.info.name + ", join!");
+        this._onSystemMessage(ev.peer.info.name + ", join!");
 
-      if (ev.state == PeerState.JOIN) {
-        notificationTip("Peer Join", "peer => " + ev.peer.info.name + ", join!");
-        onSystemMessage(ev.peer.info.name + ", join!");
-      } else if (ev.state == PeerState.LEAVE) {
-        notificationTip("Peer Leave", "peer => " + ev.peer.info.name + ", leave!");
-        onSystemMessage(ev.peer.info.name + ", leave!");
-      }
+        let peerInfo = {
+          'uid':ev.peer.uid,
+          'name':ev.peer.info.name,
+          'state':ev.state,
+         };
+         let find = false;
+         peers.forEach((item) => {
+           if(item.uid == ev.peer.uid){
+             item = peerInfo;
+             find = true;
+           }
+         });
+         if(!find){
+           peers.push(peerInfo);
+         }
 
+       }else if(ev.state == PeerState.LEAVE){
+          this._notification("Peer Leave", "peer => " + ev.peer.info.name + ", leave!");
+          this._onSystemMessage(ev.peer.info.name + ", leave!");
 
-      let peerInfo = {
-        'uid': ev.peer.uid,
-        'name': ev.peer.info.name,
-        'state': ev.state,
-      };
-      let _peers = peers;
-      let find = false;
-      _peers.forEach((item) => {
-        if (item.uid == ev.peer.uid) {
-          item = peerInfo;
-          find = true;
-        }
-      });
-      if (!find) {
-        _peers.push(peerInfo);
-      }
-      setPeers([..._peers])
+          peers.filter(item => item.uid != ev.peer.uid);
+       }
+      
+        this.setState({
+          peers:peers,
+        });
     };
 
     connector.onstreamevent = (ev) => {
