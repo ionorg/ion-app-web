@@ -81,7 +81,7 @@ function Conference(props, ref) {
   const doHandleLocalStream = async (enabled) => {
     const { connector, settings } = props;
     
-    let _streams = streams;
+    let _streams = JSON.parse(JSON.stringify(streams));
     connector.ontrack = (track, stream) => {
       console.log("got track", track.id, "for stream", stream.id);
       if (track.kind === "video") {
@@ -164,12 +164,14 @@ function Conference(props, ref) {
   }
 
   const updateMuteStatus = (stream, muted) => {
-    streams.forEach((item) => {
-      if (item.id == stream.id) {
-        item.muted = muted;
-      }
-    });
-    setStreams(streams)
+    setStreams((p)=>{
+      return p.map(item=>{
+        if (item.id == stream.id) {
+          item.muted = muted;
+        }
+        return item
+      })
+    })
   }
 
   const doHandleScreenSharing = async (enabled) => {
