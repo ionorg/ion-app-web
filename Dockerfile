@@ -1,22 +1,11 @@
-FROM node:15-alpine
-
-RUN alias python=python3
-RUN apk add python3
-RUN apk add python2
-RUN apk add make
-RUN apk add gcc
-RUN apk add g++
-RUN apk add git
+FROM node:16-alpine
 
 WORKDIR /app
 
-COPY package.json ./
-RUN npm install
+COPY package.json package-lock.json ./
+RUN npm ci
 
-COPY public/ public/
-COPY src/ src/
-COPY styles/ styles/
-COPY webpack.config.js .babelrc ./
+COPY . .
 
 RUN npm run build
 
