@@ -158,6 +158,7 @@ function App(props) {
       }
       console.log("setPeers peers= ", peers);
       setPeers([..._peers]);
+
     };
 
     room.onmessage = (msg) => {
