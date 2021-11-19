@@ -3,61 +3,6 @@ import { Form, Icon, Input, Button, Checkbox, notification, Avatar, Badge, Toolt
 import { reactLocalStorage } from "reactjs-localstorage";
 import "../styles/css/login.scss";
 
-// import CheckIcon from "mdi-react/CheckIcon";
-// import ServerNetworkIcon from "mdi-react/ServerNetworkIcon";
-// import GoogleClassroomIcon from "mdi-react/GoogleClassroomIcon";
-// import ProgressClockIcon from "mdi-react/ProgressClockIcon";
-// import ProgressAlertIcon from "mdi-react/ProgressAlertIcon";
-// import ProgressCloseIcon from "mdi-react/ProgressCloseIcon";
-// import UploadLockIcon from "mdi-react/UploadLockIcon";
-// import DownloadLockIcon from "mdi-react/DownloadLockIcon";
-
-// const TEST_STEPS = {
-//   biz: { title: 'Biz Websocket', icon: <ServerNetworkIcon /> },
-//   lobby: { title: 'Joining Test Room', icon: <GoogleClassroomIcon /> },
-//   publish: { title: 'Publish', icon: <UploadLockIcon /> },
-//   subscribe: { title: 'Subscription', icon: <DownloadLockIcon /> },
-// };
-
-// const ICONS = {
-//   connected: CheckIcon,
-//   ok: CheckIcon,
-//   pending: ProgressClockIcon,
-//   warning: ProgressAlertIcon,
-//   "no candidates": ProgressAlertIcon,
-//   error: ProgressCloseIcon,
-//   joined: CheckIcon,
-//   published: CheckIcon,
-//   subscribed: CheckIcon,
-// };
-
-
-// const DEFAULT_STATE = {
-//   testing: null,
-//   success: null,
-//   steps: TEST_STEPS
-// };
-// const ConnectionStep = ({ step }) => {
-//   const color = (
-//     step.status === 'pending' ? null :
-//       step.status === 'warning' || step.status === 'no candidates' ? 'orange' :
-//         step.status === 'error' ? 'red' :
-//           'green');
-//   const Icon = ICONS[step.status];
-
-//   return <div className='test-connection-step'>
-//     <Badge count={Icon ? <Icon style={{ color }} /> : null}>
-//       <Tooltip title={<>
-//         {step.title}
-//         {step.status ? ": " + step.status : null}
-//         {step.info ? <div>{step.info}</div> : null}
-//       </>}
-//       >
-//         <Avatar shape="square" size="large" icon={step.icon} />
-//       </Tooltip>
-//     </Badge>
-//   </div>;
-// };
 
 function LoginForm(props) {
   //state = DEFAULT_STATE;
@@ -65,10 +10,7 @@ function LoginForm(props) {
 
   useEffect(() => {
     const { form } = props;
-    console.log("window.location:" + window.location);
-    console.log("url:" + window.location.protocol + window.location.host + "  " + window.location.pathname + window.location.query);
-
-    console.log('Making test client');
+    console.log("url:" + window.location.protocol + window.location.host + "  " + window.location.pathname);
 
     let params = getRequest();
 
@@ -82,7 +24,6 @@ function LoginForm(props) {
       roomId = localStorage.roomId;
       displayName = localStorage.displayName;
       audioOnly = localStorage.audioOnly;
-      console.log('localStorage:' + roomId + ' ' + displayName);
     }
 
     if (params && params.hasOwnProperty('room')) {
@@ -117,129 +58,8 @@ function LoginForm(props) {
   };
 
   const cleanup = async () => {
-    // if (testUpdateLoop)
-    //   clearInterval(testUpdateLoop);
-    // if (stream) {
-    //   await stopMediaStream(stream);
-    //   await stream.unpublish();
-    // }
-    // if (client)
-    //   await client.leave();
+    
   };
-
-  // _testStep(step, status, info = null) {
-  //   const prior = this.state.steps[step];
-  //   this.setState({
-  //     steps: {
-  //       ...this.state.steps,
-  //       [step]: { ...prior, status, info }
-  //     }
-  //   });
-  //   console.log('Test Connection:', step, status, info);
-  // }
-
-  // _testConnection = async () => {
-  //   this.setState({test: true})
-  //   this._testStep('biz', 'pending');
-  //   let client = this.props.createClient();
-  //   let testUpdateLoop = null;
-
-
-  //   window.onunload = () => {
-  //     cleanup()
-  //   }
-
-  //   client.on("transport-open", async () => {
-  //     this._testStep('biz', 'connected', client.url);
-  //     this._testStep('lobby', 'pending');
-  //     const rid = 'lobby-' + Math.floor(1000000 * Math.random());
-  //     await this.client.join(rid, { name: 'lobby-user' });
-  //     this._testStep('lobby', 'joined', 'room id='+rid);
-  //     const localStream = await LocalStream.getUserMedia({
-  //       codec: 'VP8',
-  //       resolution: 'hd',
-  //       bandwidth: 1024,
-  //       audio: true,
-  //       video: true,
-  //     });
-
-  //     this._testStep('publish', 'pending');
-
-  //     const publish = await client.publish(localStream);
-
-  //     let nominated = null;
-
-  //     const testConnectionUpdateLoop = () => {
-  //       updateConnectionStats();
-  //       const subStatus = this.state.steps.subscribe.status;
-  //       if (subStatus === 'pending' || subStatus === 'error') {
-  //         trySubscribe();
-  //       }
-  //     };
-  //     testUpdateLoop = setInterval(testConnectionUpdateLoop, 3000);
-  //     setTimeout(testConnectionUpdateLoop, 150);
-
-  //     const trySubscribe = async () => {
-  //       const mid = client.local.mid;
-  //       let tracks = {}
-
-  //       try {
-  //         for (let track of localStream.getTracks()) {
-  //           tracks[`${mid} ${track.id}`] = {
-  //             codec: track.codec,
-  //             fmtp: "",
-  //             id: track.id,
-  //             pt: client.local.transport.rtp[0].payload,
-  //             type: track.kind,
-  //           };
-  //         }
-  //       } catch (e) { console.log("No tracks yet...")}
-
-  //       if (!mid) return;
-  //       client.knownStreams.set(mid, objToStrMap(tracks));
-
-
-  //       console.log('Trying to subscribe to ...', mid);
-
-  //       try {
-  //         let stream = await client.subscribe(mid);
-  //         this._testStep('subscribe', 'subscribed', 'mid: ' + mid);
-
-  //       } catch (e) {
-  //         console.log(e)
-  //         this._testStep('subscribe', 'error');
-  //       }
-
-  //     };
-
-  //     const updateConnectionStats = async () => {
-  //       const report = await client.local.transport.pc.getStats();
-  //       const stats = {};
-  //       for (let [name, stat] of report) {
-  //         stats[name] = stat;
-  //         if (stat.nominated) {
-  //           nominated = stat;
-  //         }
-  //       }
-
-  //       if (nominated) {
-  //         const latency = nominated.currentRoundTripTime;
-  //         const availableBitrate = nominated.availableOutgoingBitrate;
-  //         const info = `${localStream.getTracks().length} tracks, ${Math.floor(latency / 1000.0)}ms latency` + (
-  //           availableBitrate ? `, ${Math.floor(availableBitrate / 1024)}kbps available` : "");
-  //         this._testStep('publish', 'published', info);
-  //       } else {
-  //         this._testStep('publish', 'no candidates');
-  //       }
-
-  //     };
-
-  //     this._testStep('subscribe', 'pending');
-
-  //   });
-
-  //   window.test_client = this.client = client;
-  // };
 
   const handleSubmit = e => {
     e.preventDefault();
@@ -322,14 +142,6 @@ function LoginForm(props) {
     </>
   );
 }
-
-// function objToStrMap(obj) {
-//   const strMap = new Map();
-//   for (const k of Object.keys(obj)) {
-//     strMap.set(k, obj[k]);
-//   }
-//   return strMap;
-// }
 
 const WrappedLoginForm = Form.create({ name: "login" })(LoginForm);
 export default WrappedLoginForm;
