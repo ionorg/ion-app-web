@@ -1,7 +1,7 @@
 import React, { useState, useImperativeHandle } from "react";
 import { Spin, notification } from "antd";
 import { LocalVideoView, MainVideoView, SmallVideoView } from "./videoview";
-import "../styles/css/conference.scss";
+import "../styles/css/conference.css";
 import * as Ion from "ion-sdk-js/lib/connector";
 
 function Conference(props, ref) {

@@ -18,7 +18,7 @@ module.exports = (env) => {
         use: ['babel-loader']
       }, {
         test: /\.(scss|less|css)$/,
-        use: ['style-loader', 'css-loader', 'sass-loader']
+        use: ['style-loader', 'css-loader']
       },
       {
         test: /\.(png|jpe?g|gif|svg)$/i,

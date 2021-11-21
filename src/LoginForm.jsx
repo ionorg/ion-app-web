@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Form, Icon, Input, Button, Checkbox, notification, Avatar, Badge, Tooltip } from "antd";
 import { reactLocalStorage } from "reactjs-localstorage";
-import "../styles/css/login.scss";
+import "../styles/css/login.css";
 
 
 function LoginForm(props) {
