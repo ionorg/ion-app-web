@@ -25,7 +25,7 @@
     "extract-text-webpack-plugin": "4.0.0-beta.0",
     "file-loader": "6.0.0",
     "html-webpack-plugin": "4.3.0",
-    "node-sass": "4.14.1",
+    "sass": "1.43.4",
     "sass-loader": "8.0.2",
     "style-loader": "1.2.1",
     "webpack": "4.43.0",
@@ -35,7 +35,7 @@
   "dependencies": {
     "antd": "^3.26.16",
     "copy-webpack-plugin": "^5.0.5",
-    "ion-sdk-js": "^1.7.2",
+    "ion-sdk-js": "^1.8.1",
     "mdi-react": "^6.4.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",

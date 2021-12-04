@@ -2,7 +2,7 @@ import React, { useState, useImperativeHandle } from "react";
 import { Spin, notification } from "antd";
 import { LocalVideoView, MainVideoView, SmallVideoView } from "./videoview";
 import "../styles/css/conference.scss";
-import { LocalStream } from "ion-sdk-js/lib/ion";
+import * as Ion from "ion-sdk-js/lib/connector";
 
 function Conference(props, ref) {
 
@@ -13,18 +13,25 @@ function Conference(props, ref) {
   const [videoMuted, setVideoMuted] = useState(false)
 
   const doCleanUp = async () => {
+    console.log("doCleanUp localStreamObj=", localStreamObj, ", localScreenObj=", localScreenObj)
+    if (localStreamObj && localStreamObj.stream) {
+      await unpublish(localStreamObj.stream)
 
-    localStreamObj.stream = null
-    setLocalStream(localStreamObj)
-    localScreenObj.stream = null
-    setLocalScreen(localScreenObj)
-    setStreams([])
-
+      localStreamObj.stream = null
+      setLocalStream(localStreamObj)
+    }
+  
+    if (localScreenObj && localScreenObj.stream) {
+      await unpublish(localScreenObj.stream)
+      localScreenObj.stream = null
+      setLocalScreen(localScreenObj)
+    }
+ 
+    console.log("doCleanUp streams=", streams)
     streams.map(async item => {
-      await item.stream.unsubscribe();
+      // await item.stream.unsubscribe();
     });
-
-    await unpublish(localStreamObj.stream)
+    setStreams([])
   };
 
   const notificationTip = (message, description) => {
@@ -35,10 +42,10 @@ function Conference(props, ref) {
     });
   };
 
-  const unpublish = async stream => {
+  const unpublish = async (stream)=> {
+    console.log("stream.unpublish stream=", stream);
     if (stream) {
       await stopMediaStream(stream);
-      await stream.unpublish();
     }
   };
 
@@ -79,10 +86,10 @@ function Conference(props, ref) {
   );
 
   const doHandleLocalStream = async (enabled) => {
-    const { connector, settings } = props;
+    const { settings, rtc, peers } = props;
     
     let _streams = JSON.parse(JSON.stringify(streams));
-    connector.ontrack = (track, stream) => {
+    rtc.ontrack = (track, stream) => {
       console.log("got track", track.id, "for stream", stream.id);
       if (track.kind === "video") {
         track.onunmute = () => {
@@ -95,23 +102,25 @@ function Conference(props, ref) {
           })
 
           if (!found) {
-            console.log("stream.id:::" + stream.id);
-            let name = 'Guest';
-            let peers = props.peers;
-            peers.forEach((item) => {
-              if (item.id == stream.id) {
-                name = item.name;
-              }
-            });
+            setTimeout(() => {
+              console.log("stream.id:::" + stream.id);
+              let name = 'Guest';
+              console.log("peers=", peers, "stream=", stream);
+              peers.forEach((item) => {
+                if (item["id"] == stream.id) {
+                  name = item.name;
+                }
+              });
 
-            stream.info = { 'name': name };
-            _streams.push({ id: stream.id, stream });
-            setStreams([..._streams])
-
-            stream.onremovetrack = () => {
-              _streams = _streams.filter(item => item.id !== stream.id);
+              stream.info = { 'name': name };
+              _streams.push({ id: stream.id, stream });
               setStreams([..._streams])
-            };
+
+              stream.onremovetrack = () => {
+                _streams = _streams.filter(item => item.id !== stream.id);
+                setStreams([..._streams])
+              };
+            }, 200);
           }
           updateMuteStatus(stream, false);
         };
@@ -126,7 +135,7 @@ function Conference(props, ref) {
     };
 
     if (enabled) {
-      LocalStream.getUserMedia({
+      Ion.LocalStream.getUserMedia({
         codec: settings.codec.toUpperCase(),
         resolution: settings.resolution,
         bandwidth: settings.bandwidth,
@@ -134,16 +143,17 @@ function Conference(props, ref) {
         video: true,
       })
         .then((media) => {
+          console.log("rtc.publish media=", media)
+          rtc.publish(media)
           localStreamObj.stream = media
           setLocalStream(localStreamObj)
-          connector.sfu.publish(media);
         })
         .catch((e) => {
           console.log("handleLocalStream error => " + e);
         });
     } else {
       if (localStreamObj.stream) {
-        unpublish(localStreamObj.stream);
+        unpublish(localStreamObj.stream, rtc);
         localStreamObj.stream = null;
         setLocalStream(localStreamObj)
       }
@@ -164,6 +174,7 @@ function Conference(props, ref) {
   }
 
   const updateMuteStatus = (stream, muted) => {
+    console.log("updateMuteStatus stream=", stream, ", muted=", muted);
     setStreams((p)=>{
       return p.map(item=>{
         if (item.id == stream.id) {
@@ -175,15 +186,16 @@ function Conference(props, ref) {
   }
 
   const doHandleScreenSharing = async (enabled) => {
-    const { connector, settings, screenSharingClick } = props;
+    const {settings, screenSharingClick, rtc } = props;
     if (enabled) {
-      localScreenObj.stream = await LocalStream.getDisplayMedia({
+      localScreenObj.stream = await Ion.LocalStream.getDisplayMedia({
         codec: settings.codec.toUpperCase(),
         resolution: settings.resolution,
         bandwidth: settings.bandwidth,
-      });
+      })
+
       setLocalScreen(localScreenObj)
-      await connector.sfu.publish(localScreenObj.stream);
+      await rtc.publish(localScreenObj.stream);
       let track = localScreenObj.stream.getVideoTracks()[0];
       if (track) {
         track.addEventListener("ended", () => {
@@ -201,9 +213,11 @@ function Conference(props, ref) {
   };
 
   const stopMediaStream = async (stream) => {
+    console.log("stopMediaStream stream=", stream);
     let tracks = stream.getTracks();
     for (let i = 0, len = tracks.length; i < len; i++) {
       await tracks[i].stop();
+      console.log("stopMediaStream track=", tracks[i]);
     }
   };
 
