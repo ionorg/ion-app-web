@@ -16,6 +16,7 @@ Warning: **make sure ion is deployed by docker too**
 Build docker image with production build of web app. erve on `https://localhost:9090`
 
 Biz websocket is proxied using caddy server and docker network from ion.
+You will need to ensure that src/App.jsx line 99 has the correct port for this proxy to work.
 
 ```
 docker network create ionnet
@@ -46,6 +47,8 @@ Configure your domain/email in docker-compose.prod.yml
 WWW_URL=yourdomain
 ADMIN_EMAIL=yourname@yourdomain
 ```
+
+Verify that you're using the correct port on src/App.jsx on line 99 as you'll be using Caddy to proxy requests.
 
 Bring up docker with
 
@@ -78,6 +81,8 @@ Start dev server
 ```
 npm start
 ```
+
+Ensure that line 99 of src/App.jsx is pointed to :5551 since you can hit the SFU locally.
 
 Chat: [https://localhost:8080](https://localhost:8080)
 
