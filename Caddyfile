@@ -4,10 +4,6 @@ localhost:9090 {
 
   tls internal
 
-  reverse_proxy /biz.Biz/Signal signal:5551 {
-  }
-  reverse_proxy /sfu.SFU/Signal signal:5551 {
-  }
   reverse_proxy /room.RoomSignal/Signal signal:5551 {
   }
   reverse_proxy /rtc.RTC/Signal signal:5551 {

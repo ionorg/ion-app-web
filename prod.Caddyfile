@@ -4,11 +4,6 @@
   tls {$ADMIN_EMAIL}
 
   # proxy to signal service
-  reverse_proxy /biz.Biz/Signal signal:5551 {
-  }
-
-  reverse_proxy /sfu.SFU/Signal signal:5551 {
-  }
   # check on line 99 of src/App.jsx that you aren't setting the 5551 port value. docker uses these proxies instead
   reverse_proxy /room.RoomSignal/Signal signal:5551 {
   }
