@@ -40,7 +40,7 @@
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-mdi": "^0.5.7",
-    "react-router": "^5.0.1",
+    "react-router": "^6.0.0",
     "reactjs-localstorage": "1.0.1"
   },
   "keywords": [
