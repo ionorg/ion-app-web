@@ -33,7 +33,7 @@
     "webpack-dev-server": "3.11.3"
   },
   "dependencies": {
-    "antd": "^3.26.16",
+    "antd": "^4.0.0",
     "copy-webpack-plugin": "^5.0.5",
     "ion-sdk-js": "^1.8.1",
     "mdi-react": "^6.4.0",
