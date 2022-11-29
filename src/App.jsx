@@ -368,7 +368,7 @@ function App(props) {
       codec,
       isDevMode,
     };
-    reactLocalStorage.setObject("settings", this._settings);
+    reactLocalStorage.setObject("settings", settings);
   };
 
   const onSendMessage = (msg) => {
